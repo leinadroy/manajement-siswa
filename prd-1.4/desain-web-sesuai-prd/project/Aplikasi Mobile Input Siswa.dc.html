@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-a7a6c075-f7bf-4056-b98c-4b6d0d4420da/styles.css" />
+<script src="_ds/modernist-a7a6c075-f7bf-4056-b98c-4b6d0d4420da/_ds_bundle.js"></script>
+<title>Manajemen Siswa — Mobile App</title>
+<style>
+  body { margin: 0; background: var(--color-neutral-200); }
+  * { box-sizing: border-box; }
+</style>
+</helmet>
+
+<div style="width:390px;min-height:844px;margin:0 auto;background:var(--color-bg);display:flex;flex-direction:column;font-family:var(--font-body);position:relative;overflow:hidden">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px;gap:20px">
+    <div>
+      <div style="font-family:var(--font-heading);font-weight:800;font-size:24px;color:var(--color-text)">Masuk Admin</div>
+      <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">Kelola data siswa dari perangkat Anda.</div>
+    </div>
+    <form onSubmit="{{ doLogin }}" style="display:flex;flex-direction:column;gap:14px">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" class="input" value="{{ loginUser }}" onChange="{{ setLoginUser }}" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" class="input" value="{{ loginPass }}" onChange="{{ setLoginPass }}" />
+      </div>
+      <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px;color:var(--color-accent-700)">{{ loginError }}</div>
+      </sc-if>
+      <button type="submit" class="btn btn-primary btn-block">Masuk</button>
+      <div style="font-size:11px;color:var(--color-neutral-700)">Demo: admin / admin123</div>
+    </form>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isAppShell }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;flex:1;min-height:0">
+
+  <div style="display:flex;align-items:center;gap:10px;padding:16px;border-bottom:2px solid var(--color-divider)">
+    <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{ goBack }}" aria-label="Kembali" class="btn btn-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+    </sc-if>
+    <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1">{{ headerTitle }}</div>
+    <sc-if value="{{ showLogout }}" hint-placeholder-val="{{ true }}">
+      <button type="button" onClick="{{ askLogout }}" aria-label="Logout" class="btn btn-icon" style="margin-left:auto">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </sc-if>
+  </div>
+
+  <div style="flex:1;overflow:auto;display:flex;flex-direction:column">
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:20px 16px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:14px;color:var(--color-neutral-700)">Selamat datang,</div>
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;color:var(--color-text)">{{ sessionName }}</div>
+        </div>
+        <div class="hr"></div>
+        <button type="button" onClick="{{ openGrid }}" class="card elev-sm" style="text-align:left;cursor:pointer;border:none;width:100%;padding:16px">
+          <div style="display:flex;flex-direction:row;align-items:center;gap:14px;flex-wrap:nowrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent-700);flex:none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div style="min-width:0;flex:1">
+              <div class="card-title" style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Manajemen Siswa</div>
+              <div class="card-meta">{{ totalCount }} data siswa</div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--color-divider)">
+          <div style="display:flex;gap:8px">
+            <input type="text" class="input" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Cari nama, tempat, tanggal, J.K..." style="flex:1" />
+            <button type="button" onClick="{{ toggleFilters }}" aria-label="Filter" class="{{ filterBtnClass }}" style="flex:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
+          </div>
+          <sc-if value="{{ showFilters }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:4px;border-top:1px solid var(--color-divider)">
+              <div class="field">
+                <label>Tempat Lahir</label>
+                <select class="input" value="{{ fKota }}" onChange="{{ setFKota }}">
+                  <option value="">Semua Kota</option>
+                  <sc-for list="{{ cities }}" as="c" hint-placeholder-count="5"><option value="{{ c }}">{{ c }}</option></sc-for>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px">
+                <div class="field" style="flex:1"><label>Dari Tanggal</label><input type="date" class="input" value="{{ fDari }}" onChange="{{ setFDari }}" /></div>
+                <div class="field" style="flex:1"><label>Sampai Tanggal</label><input type="date" class="input" value="{{ fSampai }}" onChange="{{ setFSampai }}" /></div>
+              </div>
+              <div class="seg" role="radiogroup" style="width:100%">
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="lgender" checked="{{ genderAllChecked }}" onChange="{{ setGenderAll }}" />Semua</label>
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="lgender" checked="{{ genderLChecked }}" onChange="{{ setGenderL }}" />Laki-laki</label>
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="lgender" checked="{{ genderPChecked }}" onChange="{{ setGenderP }}" />Perempuan</label>
+              </div>
+              <button type="button" onClick="{{ resetFilters }}" class="btn btn-secondary btn-block">Reset Filter</button>
+            </div>
+          </sc-if>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;color:var(--color-neutral-700)">{{ filteredCount }} dari {{ totalCount }} siswa</span>
+            <button type="button" onClick="{{ openAdd }}" class="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Add
+            </button>
+          </div>
+        </div>
+        <div style="flex:1;overflow:auto">
+          <sc-for list="{{ paged }}" as="item" hint-placeholder-count="6">
+            <div onClick="{{ item.onOpen }}" style="display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+              <div style="width:48px;height:48px;flex:none;background:repeating-linear-gradient(135deg,var(--color-neutral-400),var(--color-neutral-400) 6px,var(--color-neutral-200) 6px,var(--color-neutral-200) 12px);border:1px solid var(--color-divider)"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:14px;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.nama }}</div>
+                <div style="font-size:12px;color:var(--color-neutral-700);margin-top:2px">{{ item.tempatLahir }} &middot; {{ item.tanggalLahirLabel }}</div>
+              </div>
+              <span class="{{ item.tagClass }}" style="flex:none;font-size:10px">{{ item.jenisKelaminLabel }}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:var(--color-neutral-700)"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </sc-for>
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:40px 16px;text-align:center;font-size:13px;color:var(--color-neutral-700)">Tidak ada siswa yang cocok.</div>
+          </sc-if>
+          <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:14px 16px">
+              <button type="button" onClick="{{ loadMore }}" class="btn btn-secondary btn-block">Muat Lebih Banyak</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;flex:1">
+        <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border-bottom:2px solid var(--color-divider)">
+          <div style="width:88px;height:88px;background:repeating-linear-gradient(135deg,var(--color-neutral-400),var(--color-neutral-400) 8px,var(--color-neutral-200) 8px,var(--color-neutral-200) 16px);border:1px solid var(--color-divider)"></div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:19px;color:var(--color-text)">{{ detail.nama }}</div>
+            <span class="{{ detail.tagClass }}" style="margin-top:6px;display:inline-flex">{{ detail.jenisKelaminLabel }}</span>
+          </div>
+          <div style="display:flex;gap:8px;width:100%;margin-top:6px">
+            <button type="button" onClick="{{ openEditFromDetail }}" class="btn btn-secondary" style="flex:1;justify-content:center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              Edit
+            </button>
+            <button type="button" onClick="{{ askDeleteFromDetail }}" class="btn btn-secondary" style="flex:1;justify-content:center;color:var(--color-accent-700)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              Hapus
+            </button>
+          </div>
+        </div>
+        <div style="padding:4px 16px;display:flex;flex-direction:column;overflow:auto">
+          <sc-for list="{{ detailFields }}" as="f" hint-placeholder-count="8">
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--color-divider)">
+              <span style="font-size:13px;color:var(--color-neutral-700)">{{ f.label }}</span>
+              <span style="font-size:13px;font-weight:600;color:var(--color-text);text-align:right;max-width:60%">{{ f.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+      <form onSubmit="{{ saveForm }}" style="display:flex;flex-direction:column;flex:1;overflow:auto">
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;flex:1;overflow:auto">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <label style="width:88px;height:88px;background:repeating-linear-gradient(135deg,var(--color-neutral-400),var(--color-neutral-400) 8px,var(--color-neutral-200) 8px,var(--color-neutral-200) 16px);border:1px solid var(--color-divider);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden">
+              <sc-if value="{{ hasFormPhoto }}" hint-placeholder-val="{{ false }}">
+                <img src="{{ formData.foto }}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.08)" />
+              </sc-if>
+              <sc-if value="{{ formPhotoEmpty }}" hint-placeholder-val="{{ true }}">
+                <span style="font-family:ui-monospace,monospace;font-size:9px;color:var(--color-neutral-700);text-align:center;padding:0 8px">unggah foto</span>
+              </sc-if>
+              <input type="file" accept="image/*" onChange="{{ setFormPhoto }}" style="display:none" />
+            </label>
+          </div>
+
+          <div class="field">
+            <label>Nama *</label>
+            <input type="text" class="input" value="{{ formData.nama }}" onChange="{{ fset.nama }}" />
+          </div>
+          <div class="field">
+            <label>Tempat Lahir *</label>
+            <input type="text" class="input" value="{{ formData.tempatLahir }}" onChange="{{ fset.tempatLahir }}" />
+          </div>
+          <div class="field">
+            <label>Tanggal Lahir *</label>
+            <input type="date" class="input" value="{{ formData.tanggalLahir }}" onChange="{{ fset.tanggalLahir }}" />
+          </div>
+          <div class="field">
+            <label>Jenis Kelamin *</label>
+            <div class="seg" role="radiogroup" style="width:100%">
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="fgender" checked="{{ formGenderLChecked }}" onChange="{{ setFormGenderL }}" />Laki-laki</label>
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="fgender" checked="{{ formGenderPChecked }}" onChange="{{ setFormGenderP }}" />Perempuan</label>
+            </div>
+          </div>
+
+          <button type="button" onClick="{{ toggleExtra }}" style="background:none;border:none;cursor:pointer;font-size:13px;font-weight:800;color:var(--color-accent-700);padding:8px 0 0;text-align:left">{{ extraToggleLabel }}</button>
+
+          <sc-if value="{{ showExtra }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="field"><label>NIS</label><input type="text" class="input" value="{{ formData.nis }}" onChange="{{ fset.nis }}" /></div>
+              <div class="field"><label>NISN</label><input type="text" class="input" value="{{ formData.nisn }}" onChange="{{ fset.nisn }}" /></div>
+              <div class="field">
+                <label>Agama</label>
+                <select class="input" value="{{ formData.agama }}" onChange="{{ fset.agama }}">
+                  <sc-for list="{{ religions }}" as="r" hint-placeholder-count="6"><option value="{{ r }}">{{ r }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Kewarganegaraan</label><input type="text" class="input" value="{{ formData.kewarganegaraan }}" onChange="{{ fset.kewarganegaraan }}" /></div>
+              <div class="field"><label>Anak Ke-</label><input type="number" class="input" value="{{ formData.anakKe }}" onChange="{{ fset.anakKe }}" /></div>
+              <div class="field"><label>Jumlah Saudara Kandung</label><input type="number" class="input" value="{{ formData.jumlahSaudara }}" onChange="{{ fset.jumlahSaudara }}" /></div>
+              <div class="field"><label>No. Telepon/HP</label><input type="text" class="input" value="{{ formData.telepon }}" onChange="{{ fset.telepon }}" /></div>
+              <div class="field"><label>Email</label><input type="email" class="input" value="{{ formData.email }}" onChange="{{ fset.email }}" /></div>
+              <div class="field"><label>Alamat</label><textarea class="input" rows="2" value="{{ formData.alamat }}" onChange="{{ fset.alamat }}" style="resize:vertical"></textarea></div>
+              <div class="field"><label>Nama Ayah</label><input type="text" class="input" value="{{ formData.namaAyah }}" onChange="{{ fset.namaAyah }}" /></div>
+              <div class="field"><label>Nama Ibu</label><input type="text" class="input" value="{{ formData.namaIbu }}" onChange="{{ fset.namaIbu }}" /></div>
+              <div class="field"><label>Pekerjaan Ayah</label><input type="text" class="input" value="{{ formData.pekerjaanAyah }}" onChange="{{ fset.pekerjaanAyah }}" /></div>
+              <div class="field"><label>Pekerjaan Ibu</label><input type="text" class="input" value="{{ formData.pekerjaanIbu }}" onChange="{{ fset.pekerjaanIbu }}" /></div>
+              <div class="field"><label>Hobi</label><input type="text" class="input" value="{{ formData.hobi }}" onChange="{{ fset.hobi }}" /></div>
+              <div class="field"><label>Riwayat Pendidikan Formal</label><input type="text" class="input" value="{{ formData.riwayatFormal }}" onChange="{{ fset.riwayatFormal }}" /></div>
+              <div class="field"><label>Riwayat Pendidikan Informal</label><input type="text" class="input" value="{{ formData.riwayatInformal }}" onChange="{{ fset.riwayatInformal }}" /></div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;gap:10px;padding:16px;border-top:2px solid var(--color-divider)">
+          <button type="button" onClick="{{ cancelForm }}" class="btn btn-secondary" style="flex:1;justify-content:center">Batal</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center">Simpan</button>
+        </div>
+      </form>
+    </sc-if>
+
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ deleteTarget }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop">
+    <div class="dialog">
+      <div class="dialog-title">Hapus data siswa?</div>
+      <div class="dialog-body">Data {{ deleteTargetName }} akan dihapus secara permanen dan tidak dapat dikembalikan.</div>
+      <div class="dialog-actions">
+        <button type="button" onClick="{{ cancelDelete }}" class="btn btn-secondary">Batal</button>
+        <button type="button" onClick="{{ confirmDelete }}" class="btn btn-primary">Hapus</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ logoutConfirm }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop">
+    <div class="dialog">
+      <div class="dialog-title">Keluar dari sistem?</div>
+      <div class="dialog-body">Apakah Anda yakin ingin logout dari sesi admin ini?</div>
+      <div class="dialog-actions">
+        <button type="button" onClick="{{ cancelLogout }}" class="btn btn-secondary">Tidak</button>
+        <button type="button" onClick="{{ doLogout }}" class="btn btn-primary">Ya</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;sampleCount&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:30,&quot;min&quot;:10,&quot;max&quot;:60,&quot;step&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Data&quot;}}">
+const MALE_NAMES = ['Andi','Budi','Rizki','Fajar','Bayu','Dimas','Agus','Hendra','Yusuf','Fadli','Arya','Wahyu','Rian','Doni','Eko'];
+const FEMALE_NAMES = ['Siti','Putri','Ayu','Rina','Dewi','Fitri','Wulan','Nadia','Indah','Sri','Maya','Lestari','Ratna','Yuni','Intan'];
+const LAST_NAMES = ['Saputra','Wijaya','Kurniawan','Pratama','Santoso','Hidayat','Nugroho','Setiawan','Firmansyah','Susanto','Permadi','Gunawan','Yulianto','Rahmawati','Anggraini'];
+const CITIES = ['Jakarta','Surabaya','Bandung','Medan','Semarang','Makassar','Palembang','Yogyakarta','Malang','Denpasar','Bekasi','Depok'];
+const RELIGIONS = ['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu'];
+const JOBS = ['Wiraswasta','PNS','Guru','Petani','Karyawan Swasta','Dokter','Pedagang','Sopir','Nelayan','TNI/Polri'];
+const HOBBIES = ['Membaca','Sepak Bola','Menggambar','Musik','Berenang','Bulu Tangkis','Memasak','Fotografi','Menari','Catur'];
+const SCHOOLS = ['SD Negeri 1','SD Negeri 2','SD Islam Terpadu','SD Kristen','MI Nurul Huda'];
+const COURSES = ['Kursus Bahasa Inggris','Les Musik','Pramuka','Kursus Komputer','Sanggar Tari','-'];
+const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function randDate(seed) {
+  const year = 2013 + (seed % 5);
+  const month = 1 + ((seed * 3) % 12);
+  const day = 1 + ((seed * 7) % 28);
+  return year + '-' + pad(month) + '-' + pad(day);
+}
+function formatDate(iso) {
+  if (!iso) return '-';
+  const parts = iso.split('-');
+  return parseInt(parts[2], 10) + ' ' + MONTHS[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+}
+function generateStudents(n) {
+  const list = [];
+  for (let i = 1; i <= n; i++) {
+    const gender = i % 2 === 0 ? 'P' : 'L';
+    const first = gender === 'L' ? MALE_NAMES[i % MALE_NAMES.length] : FEMALE_NAMES[i % FEMALE_NAMES.length];
+    const last = LAST_NAMES[(i * 3) % LAST_NAMES.length];
+    list.push({
+      id: i, foto: null,
+      nama: first + ' ' + last,
+      tempatLahir: CITIES[i % CITIES.length],
+      tanggalLahir: randDate(i),
+      jenisKelamin: gender,
+      nis: '10' + (2200 + i),
+      nisn: '00' + (31000 + i * 7),
+      agama: RELIGIONS[i % RELIGIONS.length],
+      kewarganegaraan: 'Indonesia',
+      anakKe: 1 + (i % 4),
+      jumlahSaudara: i % 3,
+      telepon: '08' + String(1100000000 + i * 137).slice(0, 10),
+      email: (first + '.' + last).toLowerCase().replace(/\s+/g, '') + '@contoh.sch.id',
+      alamat: 'Jl. Mawar No. ' + (i + 1) + ', ' + CITIES[i % CITIES.length],
+      namaAyah: MALE_NAMES[(i + 2) % MALE_NAMES.length] + ' ' + last,
+      namaIbu: FEMALE_NAMES[(i + 5) % FEMALE_NAMES.length] + ' ' + last,
+      pekerjaanAyah: JOBS[i % JOBS.length],
+      pekerjaanIbu: JOBS[(i + 3) % JOBS.length],
+      hobi: HOBBIES[i % HOBBIES.length],
+      riwayatFormal: SCHOOLS[i % SCHOOLS.length],
+      riwayatInformal: COURSES[i % COURSES.length],
+    });
+  }
+  return list;
+}
+function emptyForm() {
+  return { id: null, foto: null, nama: '', tempatLahir: '', tanggalLahir: '', jenisKelamin: '', nis: '', nisn: '', agama: '', kewarganegaraan: 'Indonesia', anakKe: '', jumlahSaudara: '', telepon: '', email: '', alamat: '', namaAyah: '', namaIbu: '', pekerjaanAyah: '', pekerjaanIbu: '', hobi: '', riwayatFormal: '', riwayatInformal: '' };
+}
+
+class Component extends DCLogic {
+  state = {
+    view: 'login',
+    students: generateStudents(this.props.sampleCount || 30),
+    session: null,
+    loginUser: '', loginPass: '', loginError: '',
+    search: '', visible: 15, showFilters: false, fKota: '', fDari: '', fSampai: '', gender: 'ALL',
+    detailId: null, editReturnsToDetail: false,
+    formData: null, showExtra: false,
+    deleteTarget: null, deleteFrom: 'grid',
+    logoutConfirm: false,
+  };
+
+  setLoginUser = (e) => this.setState({ loginUser: e.target.value });
+  setLoginPass = (e) => this.setState({ loginPass: e.target.value });
+  doLoginSubmit = (e) => {
+    e.preventDefault();
+    if (this.state.loginUser === 'admin' && this.state.loginPass === 'admin123') {
+      this.setState({ session: { name: 'Budi Santoso' }, view: 'dashboard', loginError: '', loginUser: '', loginPass: '' });
+    } else {
+      this.setState({ loginError: 'Username atau password salah.' });
+    }
+  };
+  askLogout = () => this.setState({ logoutConfirm: true });
+  cancelLogout = () => this.setState({ logoutConfirm: false });
+  doLogout = () => this.setState({ session: null, view: 'login', loginUser: '', loginPass: '', loginError: '', logoutConfirm: false, view2: null });
+
+  openGrid = () => this.setState({ view: 'grid', search: '', visible: 15 });
+  toggleFilters = () => this.setState((s) => ({ showFilters: !s.showFilters }));
+  setFKota = (e) => this.setState({ fKota: e.target.value, visible: 15 });
+  setFDari = (e) => this.setState({ fDari: e.target.value, visible: 15 });
+  setFSampai = (e) => this.setState({ fSampai: e.target.value, visible: 15 });
+  setGenderAll = () => this.setState({ gender: 'ALL', visible: 15 });
+  setGenderL = () => this.setState({ gender: 'L', visible: 15 });
+  setGenderP = () => this.setState({ gender: 'P', visible: 15 });
+  resetFilters = () => this.setState({ fKota: '', fDari: '', fSampai: '', gender: 'ALL', search: '', visible: 15 });
+  goToDashboard = () => this.setState({ view: 'dashboard' });
+  setSearch = (e) => this.setState({ search: e.target.value, visible: 15 });
+  loadMore = () => this.setState((s) => ({ visible: s.visible + 15 }));
+
+  openDetail = (id) => this.setState({ view: 'detail', detailId: id });
+  openAdd = () => this.setState({ view: 'form', formData: emptyForm(), showExtra: false, editReturnsToDetail: false });
+  openEdit = (s) => this.setState({ view: 'form', formData: Object.assign({}, s), showExtra: false, editReturnsToDetail: false });
+  openEditFromDetail = () => {
+    const s = this.state.students.find((x) => x.id === this.state.detailId);
+    this.setState({ view: 'form', formData: Object.assign({}, s), showExtra: false, editReturnsToDetail: true });
+  };
+  askDeleteFromGrid = (s) => this.setState({ deleteTarget: s, deleteFrom: 'grid' });
+  askDeleteFromDetail = () => {
+    const s = this.state.students.find((x) => x.id === this.state.detailId);
+    this.setState({ deleteTarget: s, deleteFrom: 'detail' });
+  };
+  cancelDelete = () => this.setState({ deleteTarget: null });
+  confirmDelete = () => {
+    const id = this.state.deleteTarget.id;
+    this.setState((st) => ({ students: st.students.filter((s) => s.id !== id), deleteTarget: null, view: 'grid', detailId: null }));
+  };
+
+  setFormGenderL = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { jenisKelamin: 'L' }) }));
+  setFormGenderP = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { jenisKelamin: 'P' }) }));
+  setFormPhoto = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { foto: reader.result }) }));
+    reader.readAsDataURL(file);
+  };
+  toggleExtra = () => this.setState((st) => ({ showExtra: !st.showExtra }));
+  cancelForm = () => {
+    if (this.state.editReturnsToDetail) this.setState({ view: 'detail', formData: null });
+    else this.setState({ view: 'grid', formData: null });
+  };
+  saveForm = (e) => {
+    e.preventDefault();
+    const f = this.state.formData;
+    if (!f.nama || !f.nama.trim() || !f.tempatLahir || !f.tempatLahir.trim() || !f.tanggalLahir || !f.jenisKelamin) return;
+    this.setState((st) => {
+      let students, newId = f.id;
+      if (f.id) {
+        students = st.students.map((s) => (s.id === f.id ? f : s));
+      } else {
+        newId = st.students.reduce((m, s) => Math.max(m, s.id), 0) + 1;
+        students = [Object.assign({}, f, { id: newId }), ...st.students];
+      }
+      return { students, view: st.editReturnsToDetail ? 'detail' : 'grid', detailId: st.editReturnsToDetail ? newId : st.detailId, formData: null };
+    });
+  };
+
+  goBack = () => {
+    const v = this.state.view;
+    if (v === 'grid') this.setState({ view: 'dashboard' });
+    else if (v === 'detail') this.setState({ view: 'grid', detailId: null });
+    else if (v === 'form') this.cancelForm();
+  };
+
+  renderVals() {
+    const st = this.state;
+    const q = st.search.trim().toLowerCase();
+    const filtered = st.students.filter((s) => {
+      if (q) {
+        const genderLabel = s.jenisKelamin === 'L' ? 'laki-laki' : 'perempuan';
+        const hit = s.nama.toLowerCase().includes(q) || s.tempatLahir.toLowerCase().includes(q) ||
+          formatDate(s.tanggalLahir).toLowerCase().includes(q) || genderLabel.includes(q);
+        if (!hit) return false;
+      }
+      if (st.gender !== 'ALL' && s.jenisKelamin !== st.gender) return false;
+      if (st.fKota && s.tempatLahir !== st.fKota) return false;
+      if (st.fDari && s.tanggalLahir < st.fDari) return false;
+      if (st.fSampai && s.tanggalLahir > st.fSampai) return false;
+      return true;
+    });
+    const cities = Array.from(new Set(st.students.map((s) => s.tempatLahir))).sort();
+    const activeFilterCount = (st.fKota ? 1 : 0) + (st.fDari ? 1 : 0) + (st.fSampai ? 1 : 0) + (st.gender !== 'ALL' ? 1 : 0);
+    const paged = filtered.slice(0, st.visible).map((s) => ({
+      id: s.id, nama: s.nama, tempatLahir: s.tempatLahir,
+      tanggalLahirLabel: formatDate(s.tanggalLahir),
+      jenisKelaminLabel: s.jenisKelamin === 'L' ? 'L' : 'P',
+      tagClass: s.jenisKelamin === 'L' ? 'tag tag-neutral' : 'tag tag-accent',
+      onOpen: () => this.openDetail(s.id),
+    }));
+
+    const detailSrc = st.detailId ? st.students.find((s) => s.id === st.detailId) : null;
+    const detail = detailSrc ? {
+      nama: detailSrc.nama,
+      jenisKelaminLabel: detailSrc.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+      tagClass: detailSrc.jenisKelamin === 'L' ? 'tag tag-neutral' : 'tag tag-accent',
+    } : { nama: '', jenisKelaminLabel: '', tagClass: 'tag tag-neutral' };
+    const detailFields = detailSrc ? [
+      { label: 'NIS', value: detailSrc.nis || '-' },
+      { label: 'NISN', value: detailSrc.nisn || '-' },
+      { label: 'Tempat Lahir', value: detailSrc.tempatLahir },
+      { label: 'Tanggal Lahir', value: formatDate(detailSrc.tanggalLahir) },
+      { label: 'Jenis Kelamin', value: detailSrc.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan' },
+      { label: 'Agama', value: detailSrc.agama || '-' },
+      { label: 'Kewarganegaraan', value: detailSrc.kewarganegaraan || '-' },
+      { label: 'Anak Ke-', value: String(detailSrc.anakKe || '-') },
+      { label: 'Jumlah Saudara Kandung', value: String(detailSrc.jumlahSaudara ?? '-') },
+      { label: 'No. Telepon/HP', value: detailSrc.telepon || '-' },
+      { label: 'Email', value: detailSrc.email || '-' },
+      { label: 'Alamat', value: detailSrc.alamat || '-' },
+      { label: 'Nama Ayah', value: detailSrc.namaAyah || '-' },
+      { label: 'Nama Ibu', value: detailSrc.namaIbu || '-' },
+      { label: 'Pekerjaan Ayah', value: detailSrc.pekerjaanAyah || '-' },
+      { label: 'Pekerjaan Ibu', value: detailSrc.pekerjaanIbu || '-' },
+      { label: 'Hobi', value: detailSrc.hobi || '-' },
+      { label: 'Riwayat Pendidikan Formal', value: detailSrc.riwayatFormal || '-' },
+      { label: 'Riwayat Pendidikan Informal', value: detailSrc.riwayatInformal || '-' },
+    ] : [];
+
+    const fields = ['nis', 'nisn', 'agama', 'kewarganegaraan', 'anakKe', 'jumlahSaudara', 'telepon', 'email', 'alamat', 'namaAyah', 'namaIbu', 'pekerjaanAyah', 'pekerjaanIbu', 'hobi', 'riwayatFormal', 'riwayatInformal', 'nama', 'tempatLahir', 'tanggalLahir'];
+    const fset = {};
+    fields.forEach((f) => { fset[f] = (e) => { const v = e && e.target ? e.target.value : e; this.setState((s) => ({ formData: Object.assign({}, s.formData, { [f]: v }) })); }; });
+
+    const titles = { dashboard: 'Dashboard', grid: 'Manajemen Siswa', detail: 'Detail Siswa', form: (st.formData && st.formData.id) ? 'Edit Siswa' : 'Tambah Siswa' };
+
+    return {
+      isLogin: st.view === 'login',
+      isAppShell: st.view !== 'login',
+      isDashboard: st.view === 'dashboard', isGrid: st.view === 'grid', isDetail: st.view === 'detail', isForm: st.view === 'form',
+      headerTitle: titles[st.view] || '',
+      showBack: st.view !== 'dashboard',
+      showLogout: st.view !== 'form',
+      goBack: this.goBack, askLogout: this.askLogout,
+
+      loginUser: st.loginUser, loginPass: st.loginPass, loginError: st.loginError,
+      setLoginUser: this.setLoginUser, setLoginPass: this.setLoginPass, doLogin: this.doLoginSubmit,
+
+      sessionName: st.session ? st.session.name : 'Admin',
+      totalCount: st.students.length, openGrid: this.openGrid,
+
+      search: st.search, setSearch: this.setSearch, filteredCount: filtered.length,
+      showFilters: st.showFilters, toggleFilters: this.toggleFilters,
+      filterBtnClass: 'btn btn-icon' + (activeFilterCount > 0 ? ' btn-primary' : ' btn-secondary'),
+      cities, fKota: st.fKota, fDari: st.fDari, fSampai: st.fSampai,
+      setFKota: this.setFKota, setFDari: this.setFDari, setFSampai: this.setFSampai, resetFilters: this.resetFilters,
+      genderAllChecked: st.gender === 'ALL', genderLChecked: st.gender === 'L', genderPChecked: st.gender === 'P',
+      setGenderAll: this.setGenderAll, setGenderL: this.setGenderL, setGenderP: this.setGenderP,
+      paged, isEmpty: filtered.length === 0, hasMore: st.visible < filtered.length, loadMore: this.loadMore,
+      openAdd: this.openAdd,
+
+      detail, detailFields, openEditFromDetail: this.openEditFromDetail, askDeleteFromDetail: this.askDeleteFromDetail,
+
+      formData: st.formData || emptyForm(),
+      formPhotoEmpty: !(st.formData && st.formData.foto),
+      hasFormPhoto: !!(st.formData && st.formData.foto),
+      setFormPhoto: this.setFormPhoto,
+      formGenderLChecked: st.formData && st.formData.jenisKelamin === 'L',
+      formGenderPChecked: st.formData && st.formData.jenisKelamin === 'P',
+      setFormGenderL: this.setFormGenderL, setFormGenderP: this.setFormGenderP,
+      showExtra: st.showExtra, toggleExtra: this.toggleExtra,
+      extraToggleLabel: st.showExtra ? 'Sembunyikan Data Tambahan ▴' : 'Data Tambahan (opsional) ▾',
+      religions: RELIGIONS, fset,
+      cancelForm: this.cancelForm, saveForm: this.saveForm,
+
+      deleteTarget: st.deleteTarget, deleteTargetName: st.deleteTarget ? st.deleteTarget.nama : '',
+      cancelDelete: this.cancelDelete, confirmDelete: this.confirmDelete,
+      logoutConfirm: st.logoutConfirm, cancelLogout: this.cancelLogout, doLogout: this.doLogout,
+    };
+  }
+}
+</script>
+</body>
+</html>

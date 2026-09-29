@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sistem Manajemen Data Siswa</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" />
+<style>
+  body { margin: 0; background: #f3f2f2; color: #201e1d; font-family: 'Archivo', sans-serif; }
+  * { box-sizing: border-box; }
+  input, select, textarea, button { font-family: 'Archivo', sans-serif; }
+  a { color: #ec3013; }
+  a:hover { color: #ae1800; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;min-height:100vh">
+  <div style="display:flex;align-items:center;gap:24px;padding:18px 40px;border-bottom:2px solid rgba(32,30,29,.4)">
+    <span style="font-weight:800;font-size:19px;letter-spacing:-0.01em">Direktori Siswa</span>
+    <span style="margin-left:auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.55)">Data Publik &middot; Read-only</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr) auto;gap:16px;align-items:end;padding:24px 40px;background:#eae9e9;border-bottom:2px solid rgba(32,30,29,.4)">
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Tempat Lahir</label>
+      <select value="{{ fKota }}" onChange="{{ setFKota }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)">
+        <option value="">Semua Kota</option>
+        <sc-for list="{{ cities }}" as="c" hint-placeholder-count="5">
+          <option value="{{ c }}">{{ c }}</option>
+        </sc-for>
+      </select>
+    </div>
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Tanggal Lahir — Dari</label>
+      <input type="date" value="{{ fDari }}" onChange="{{ setFDari }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)" />
+    </div>
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Tanggal Lahir — Sampai</label>
+      <input type="date" value="{{ fSampai }}" onChange="{{ setFSampai }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)" />
+    </div>
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Jenis Kelamin</label>
+      <div style="display:inline-flex;border:1px solid rgba(32,30,29,.4);overflow:hidden;width:100%">
+        <button type="button" onClick="{{ setFGenderAll }}" style="{{ segAllStyle }}">Semua</button>
+        <button type="button" onClick="{{ setFGenderL }}" style="{{ segLStyle }}">Laki-laki</button>
+        <button type="button" onClick="{{ setFGenderP }}" style="{{ segPStyle }}">Perempuan</button>
+      </div>
+    </div>
+    <button type="button" onClick="{{ resetFilters }}" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:800;font-size:13px;color:#201e1d;background:transparent;border:1px solid rgba(32,30,29,.4);padding:9px 16px;white-space:nowrap">Reset</button>
+  </div>
+
+  <div style="padding:16px 40px 0;font-size:13px;color:rgba(32,30,29,.6)">Menampilkan {{ filteredCount }} dari {{ totalCount }} siswa</div>
+
+  <div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px;padding:20px 40px 40px">
+    <sc-for list="{{ pagedLanding }}" as="item" hint-placeholder-count="8">
+      <div style="background:#eae9e9;display:flex;flex-direction:column">
+        <div style="position:relative;height:170px;background:repeating-linear-gradient(135deg,#d7d3d3,#d7d3d3 10px,#e5e2e2 10px,#e5e2e2 20px);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.05em;color:rgba(32,30,29,.55);background:#f3f2f2;padding:3px 8px">foto siswa</span>
+        </div>
+        <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-weight:800;font-size:16px;line-height:1.2">{{ item.nama }}</div>
+          <div style="font-size:13px;color:rgba(32,30,29,.7)">Lahir di {{ item.tempatLahir }}</div>
+          <div style="font-size:13px;color:rgba(32,30,29,.7)">{{ item.tanggalLahirLabel }}</div>
+          <span style="display:inline-flex;align-self:flex-start;font-size:11px;letter-spacing:.02em;padding:3px 10px;margin-top:4px;background:#fff2ef;color:#ae1800">{{ item.jenisKelaminLabel }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;justify-content:center;gap:6px;padding:0 40px 40px;flex-wrap:wrap">
+    <sc-for list="{{ landingPages }}" as="p" hint-placeholder-count="3">
+      <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.page }}</button>
+    </sc-for>
+  </div>
+
+  <div style="margin-top:auto;padding:20px 40px;border-top:2px solid rgba(32,30,29,.4);text-align:center">
+    <button type="button" onClick="{{ gotoLogin }}" style="background:none;border:none;cursor:pointer;font-size:11px;letter-spacing:.06em;color:rgba(32,30,29,.35);text-transform:uppercase">Portal Staf</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px">
+  <form onSubmit="{{ doLogin }}" style="width:min(360px,100%);display:flex;flex-direction:column;gap:16px;padding:36px;background:#eae9e9">
+    <h1 style="font-size:22px;margin:0 0 4px">Login Admin</h1>
+    <p style="font-size:13px;color:rgba(32,30,29,.6);margin:0 0 8px">Halaman ini tidak ditautkan dari halaman publik.</p>
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Username</label>
+      <input type="text" value="{{ loginUser }}" onChange="{{ setLoginUser }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)" />
+    </div>
+    <div>
+      <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Password</label>
+      <input type="password" value="{{ loginPass }}" onChange="{{ setLoginPass }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)" />
+    </div>
+    <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:12px;color:#ae1800">{{ loginError }}</div>
+    </sc-if>
+    <button type="submit" style="display:inline-flex;align-items:center;justify-content:flex-start;gap:6px;cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:11px 18px;width:100%" style-hover="background:#dd2b0f">Masuk</button>
+    <sc-if value="{{ showLoginHint }}" hint-placeholder-val="{{ true }}">
+      <p style="font-size:11px;color:rgba(32,30,29,.5);margin:0">Demo: admin / admin123</p>
+    </sc-if>
+    <button type="button" onClick="{{ gotoLanding }}" style="background:none;border:none;cursor:pointer;font-size:12px;color:rgba(32,30,29,.5);text-align:left;padding:0">&larr; Kembali ke halaman publik</button>
+  </form>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAdminArea }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex:1;min-height:100vh">
+  <div style="width:240px;flex:none;background:#eae9e9;border-right:2px solid rgba(32,30,29,.4);display:flex;flex-direction:column;padding:24px 20px">
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(32,30,29,.5);margin-bottom:4px">Back Office</div>
+    <div style="font-weight:800;font-size:15px;margin-bottom:24px">{{ sessionName }}</div>
+    <button type="button" onClick="{{ gotoWelcome }}" style="{{ menuWelcomeStyle }}">Dashboard</button>
+    <button type="button" onClick="{{ openGrid }}" style="{{ menuStudentStyle }}">Manajemen Siswa</button>
+    <button type="button" onClick="{{ askLogout }}" style="margin-top:auto;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:800;font-size:13px;color:#201e1d;background:transparent;border:1px solid rgba(32,30,29,.4);padding:10px 14px;justify-content:flex-start">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </div>
+
+  <div style="flex:1;padding:40px;overflow:auto">
+
+    <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px">
+        <h1 style="font-size:30px;margin-bottom:8px">Selamat datang, {{ sessionName }}</h1>
+        <p style="font-size:14px;color:rgba(32,30,29,.65)">Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom.</p>
+        <button type="button" onClick="{{ openGrid }}" style="margin-top:16px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:11px 20px" style-hover="background:#dd2b0f">Buka Manajemen Siswa</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;margin-bottom:20px">
+          <h1 style="font-size:24px;margin:0">Manajemen Siswa</h1>
+          <button type="button" onClick="{{ openAdd }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:9px 16px" style-hover="background:#dd2b0f">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add
+          </button>
+        </div>
+        <div style="margin-bottom:16px;max-width:320px">
+          <input type="text" value="{{ boSearch }}" onChange="{{ setBoSearch }}" placeholder="Cari nama, tempat lahir, tanggal lahir, J.K..." style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#f3f2f2;border:1px solid rgba(32,30,29,.4)" />
+        </div>
+        <div style="font-size:12px;color:rgba(32,30,29,.6);margin-bottom:8px">Menampilkan {{ boFilteredCount }} data</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">Foto</th>
+              <th style="text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">Nama</th>
+              <th style="text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">Tempat Lahir</th>
+              <th style="text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">Tanggal Lahir</th>
+              <th style="text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">J.K.</th>
+              <th style="text-align:right;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(32,30,29,.6);padding:8px;border-bottom:2px solid rgba(32,30,29,.4)">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ pagedBo }}" as="item" hint-placeholder-count="6">
+              <tr style-hover="background:rgba(32,30,29,.04)">
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4)">
+                  <div style="width:36px;height:36px;background:repeating-linear-gradient(135deg,#d7d3d3,#d7d3d3 6px,#e5e2e2 6px,#e5e2e2 12px)"></div>
+                </td>
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4);font-weight:600">{{ item.nama }}</td>
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4)">{{ item.tempatLahir }}</td>
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4)">{{ item.tanggalLahirLabel }}</td>
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4)">{{ item.jenisKelamin }}</td>
+                <td style="padding:6px 8px;border-bottom:1px solid rgba(32,30,29,.4);text-align:right">
+                  <button type="button" onClick="{{ item.onEdit }}" aria-label="Edit" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:1px solid rgba(32,30,29,.4);color:#201e1d">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                  </button>
+                  <button type="button" onClick="{{ item.onDelete }}" aria-label="Delete" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:1px solid rgba(32,30,29,.4);color:#ae1800;margin-left:6px">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div style="display:flex;justify-content:center;gap:6px;padding-top:20px;flex-wrap:wrap">
+          <sc-for list="{{ boPages }}" as="p" hint-placeholder-count="3">
+            <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.page }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+      <form onSubmit="{{ saveForm }}" style="max-width:760px">
+        <h1 style="font-size:24px;margin:0 0 20px">{{ formTitle }}</h1>
+
+        <div style="display:flex;gap:20px;align-items:center;margin-bottom:24px">
+          <label style="width:110px;height:110px;flex:none;background:repeating-linear-gradient(135deg,#d7d3d3,#d7d3d3 8px,#e5e2e2 8px,#e5e2e2 16px);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden">
+            <sc-if value="{{ formData.foto }}" hint-placeholder-val="{{ false }}">
+              <img src="{{ formData.foto }}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.08)" />
+            </sc-if>
+            <sc-if value="{{ formPhotoEmpty }}" hint-placeholder-val="{{ true }}">
+              <span style="font-family:ui-monospace,monospace;font-size:10px;color:rgba(32,30,29,.55);text-align:center;padding:0 8px">klik unggah foto</span>
+            </sc-if>
+            <input type="file" accept="image/*" onChange="{{ setFormPhoto }}" style="display:none" />
+          </label>
+          <div style="font-size:12px;color:rgba(32,30,29,.6);max-width:320px">Foto siswa (wajib). Klik kotak untuk memilih berkas gambar.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px">
+          <div>
+            <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Nama *</label>
+            <input type="text" value="{{ formData.nama }}" onChange="{{ fset.nama }}" style="{{ inputStyleNama }}" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Tempat Lahir *</label>
+            <input type="text" value="{{ formData.tempatLahir }}" onChange="{{ fset.tempatLahir }}" style="{{ inputStyleTempatLahir }}" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Tanggal Lahir *</label>
+            <input type="date" value="{{ formData.tanggalLahir }}" onChange="{{ fset.tanggalLahir }}" style="{{ inputStyleTanggalLahir }}" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Jenis Kelamin *</label>
+            <div style="display:inline-flex;border:1px solid rgba(32,30,29,.4);width:100%">
+              <button type="button" onClick="{{ setFormGenderL }}" style="{{ formGenderLStyle }}">Laki-laki</button>
+              <button type="button" onClick="{{ setFormGenderP }}" style="{{ formGenderPStyle }}">Perempuan</button>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onClick="{{ toggleExtra }}" style="background:none;border:none;cursor:pointer;font-size:13px;font-weight:800;color:#ae1800;padding:12px 0 4px;text-align:left">{{ extraToggleLabel }}</button>
+
+        <sc-if value="{{ showExtra }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding-top:12px">
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">NIS</label><input type="text" value="{{ formData.nis }}" onChange="{{ fset.nis }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">NISN</label><input type="text" value="{{ formData.nisn }}" onChange="{{ fset.nisn }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div>
+              <label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Agama</label>
+              <select value="{{ formData.agama }}" onChange="{{ fset.agama }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)">
+                <sc-for list="{{ religions }}" as="r" hint-placeholder-count="6"><option value="{{ r }}">{{ r }}</option></sc-for>
+              </select>
+            </div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Kewarganegaraan</label><input type="text" value="{{ formData.kewarganegaraan }}" onChange="{{ fset.kewarganegaraan }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Anak Ke-</label><input type="number" value="{{ formData.anakKe }}" onChange="{{ fset.anakKe }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Jumlah Saudara Kandung</label><input type="number" value="{{ formData.jumlahSaudara }}" onChange="{{ fset.jumlahSaudara }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">No. Telepon/HP</label><input type="text" value="{{ formData.telepon }}" onChange="{{ fset.telepon }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Email</label><input type="email" value="{{ formData.email }}" onChange="{{ fset.email }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div style="grid-column:span 3"><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Alamat</label><textarea value="{{ formData.alamat }}" onChange="{{ fset.alamat }}" rows="2" style="width:100%;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4);resize:vertical"></textarea></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Nama Ayah</label><input type="text" value="{{ formData.namaAyah }}" onChange="{{ fset.namaAyah }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Nama Ibu</label><input type="text" value="{{ formData.namaIbu }}" onChange="{{ fset.namaIbu }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Pekerjaan Ayah</label><input type="text" value="{{ formData.pekerjaanAyah }}" onChange="{{ fset.pekerjaanAyah }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Pekerjaan Ibu</label><input type="text" value="{{ formData.pekerjaanIbu }}" onChange="{{ fset.pekerjaanIbu }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Hobi</label><input type="text" value="{{ formData.hobi }}" onChange="{{ fset.hobi }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div style="grid-column:span 3"><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Riwayat Pendidikan Formal</label><input type="text" value="{{ formData.riwayatFormal }}" onChange="{{ fset.riwayatFormal }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+            <div style="grid-column:span 3"><label style="display:block;font-size:12px;margin-bottom:5px;color:rgba(32,30,29,.7)">Riwayat Pendidikan Informal</label><input type="text" value="{{ formData.riwayatInformal }}" onChange="{{ fset.riwayatInformal }}" style="width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)" /></div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;gap:10px;margin-top:28px;padding-top:20px;border-top:2px solid rgba(32,30,29,.4)">
+          <button type="submit" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:11px 20px" style-hover="background:#dd2b0f">Simpan</button>
+          <button type="button" onClick="{{ cancelForm }}" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:800;font-size:14px;color:#201e1d;background:transparent;border:1px solid rgba(32,30,29,.4);padding:11px 20px">Batal</button>
+        </div>
+      </form>
+    </sc-if>
+
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ logoutConfirm }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;display:grid;place-items:center;padding:16px;background:rgba(45,43,43,.5)">
+    <div style="width:min(400px,100%);display:flex;flex-direction:column;gap:12px;padding:24px;background:#eae9e9;box-shadow:0 12px 32px rgba(45,43,43,.22)">
+      <div style="font-weight:800;font-size:19px">Keluar dari sistem?</div>
+      <div style="font-size:14px;opacity:.85">Apakah Anda yakin ingin logout dari sesi admin ini?</div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button type="button" onClick="{{ cancelLogout }}" style="cursor:pointer;font-weight:800;font-size:14px;color:#201e1d;background:transparent;border:1px solid rgba(32,30,29,.4);padding:9px 16px">Tidak</button>
+        <button type="button" onClick="{{ doLogout }}" style="cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:9px 16px" style-hover="background:#dd2b0f">Ya</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ deleteTarget }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;display:grid;place-items:center;padding:16px;background:rgba(45,43,43,.5)">
+    <div style="width:min(420px,100%);display:flex;flex-direction:column;gap:12px;padding:24px;background:#eae9e9;box-shadow:0 12px 32px rgba(45,43,43,.22)">
+      <div style="font-weight:800;font-size:19px">Hapus data siswa?</div>
+      <div style="font-size:14px;opacity:.85">Data {{ deleteTargetName }} akan dihapus secara permanen dan tidak dapat dikembalikan.</div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button type="button" onClick="{{ cancelDelete }}" style="cursor:pointer;font-weight:800;font-size:14px;color:#201e1d;background:transparent;border:1px solid rgba(32,30,29,.4);padding:9px 16px">Batal</button>
+        <button type="button" onClick="{{ confirmDelete }}" style="cursor:pointer;font-weight:800;font-size:14px;color:#f3f2f2;background:#ec3013;border:1px solid transparent;padding:9px 16px" style-hover="background:#dd2b0f">Hapus</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;initialView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;landing&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;login&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Perilaku&quot;},&quot;showLoginHint&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Perilaku&quot;},&quot;boPageSize&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:10,&quot;min&quot;:5,&quot;max&quot;:20,&quot;step&quot;:5,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Perilaku&quot;}}">
+const MALE_NAMES = ['Andi','Budi','Rizki','Fajar','Bayu','Dimas','Agus','Hendra','Yusuf','Fadli','Arya','Wahyu','Rian','Doni','Eko'];
+const FEMALE_NAMES = ['Siti','Putri','Ayu','Rina','Dewi','Fitri','Wulan','Nadia','Indah','Sri','Maya','Lestari','Ratna','Yuni','Intan'];
+const LAST_NAMES = ['Saputra','Wijaya','Kurniawan','Pratama','Santoso','Hidayat','Nugroho','Setiawan','Firmansyah','Susanto','Permadi','Gunawan','Yulianto','Rahmawati','Anggraini'];
+const CITIES = ['Jakarta','Surabaya','Bandung','Medan','Semarang','Makassar','Palembang','Yogyakarta','Malang','Denpasar','Bekasi','Depok'];
+const RELIGIONS = ['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu'];
+const JOBS = ['Wiraswasta','PNS','Guru','Petani','Karyawan Swasta','Dokter','Pedagang','Sopir','Nelayan','TNI/Polri'];
+const HOBBIES = ['Membaca','Sepak Bola','Menggambar','Musik','Berenang','Bulu Tangkis','Memasak','Fotografi','Menari','Catur'];
+const SCHOOLS = ['SD Negeri 1','SD Negeri 2','SD Islam Terpadu','SD Kristen','MI Nurul Huda'];
+const COURSES = ['Kursus Bahasa Inggris','Les Musik','Pramuka','Kursus Komputer','Sanggar Tari','-'];
+const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function randDate(seed) {
+  const year = 2013 + (seed % 5);
+  const month = 1 + ((seed * 3) % 12);
+  const day = 1 + ((seed * 7) % 28);
+  return year + '-' + pad(month) + '-' + pad(day);
+}
+function generateStudents(n) {
+  const list = [];
+  for (let i = 1; i <= n; i++) {
+    const gender = i % 2 === 0 ? 'P' : 'L';
+    const first = gender === 'L' ? MALE_NAMES[i % MALE_NAMES.length] : FEMALE_NAMES[i % FEMALE_NAMES.length];
+    const last = LAST_NAMES[(i * 3) % LAST_NAMES.length];
+    list.push({
+      id: i, foto: null,
+      nama: first + ' ' + last,
+      tempatLahir: CITIES[i % CITIES.length],
+      tanggalLahir: randDate(i),
+      jenisKelamin: gender,
+      nis: '10' + (2200 + i),
+      nisn: '00' + (31000 + i * 7),
+      agama: RELIGIONS[i % RELIGIONS.length],
+      kewarganegaraan: 'Indonesia',
+      anakKe: 1 + (i % 4),
+      jumlahSaudara: i % 3,
+      telepon: '08' + String(1100000000 + i * 137).slice(0, 10),
+      email: (first + '.' + last).toLowerCase().replace(/\s+/g, '') + '@contoh.sch.id',
+      alamat: 'Jl. Mawar No. ' + (i + 1) + ', ' + CITIES[i % CITIES.length],
+      namaAyah: MALE_NAMES[(i + 2) % MALE_NAMES.length] + ' ' + last,
+      namaIbu: FEMALE_NAMES[(i + 5) % FEMALE_NAMES.length] + ' ' + last,
+      pekerjaanAyah: JOBS[i % JOBS.length],
+      pekerjaanIbu: JOBS[(i + 3) % JOBS.length],
+      hobi: HOBBIES[i % HOBBIES.length],
+      riwayatFormal: SCHOOLS[i % SCHOOLS.length],
+      riwayatInformal: COURSES[i % COURSES.length],
+    });
+  }
+  return list;
+}
+function formatDate(iso) {
+  if (!iso) return '-';
+  const parts = iso.split('-');
+  return parseInt(parts[2], 10) + ' ' + MONTHS[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+}
+function emptyForm() {
+  return { id: null, foto: null, nama: '', tempatLahir: '', tanggalLahir: '', jenisKelamin: '', nis: '', nisn: '', agama: '', kewarganegaraan: 'Indonesia', anakKe: '', jumlahSaudara: '', telepon: '', email: '', alamat: '', namaAyah: '', namaIbu: '', pekerjaanAyah: '', pekerjaanIbu: '', hobi: '', riwayatFormal: '', riwayatInformal: '' };
+}
+
+const SEG_BASE = 'flex:1;padding:7px 10px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#f3f2f2;color:#201e1d';
+const SEG_ACTIVE = 'flex:1;padding:7px 10px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#ec3013;color:#f3f2f2';
+const PAGE_BTN = 'min-width:32px;height:32px;padding:0 8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(32,30,29,.4);background:#f3f2f2;color:#201e1d';
+const PAGE_BTN_ACTIVE = 'min-width:32px;height:32px;padding:0 8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;background:#ec3013;color:#f3f2f2';
+const MENU_BTN = 'display:flex;align-items:center;cursor:pointer;font-weight:600;font-size:14px;color:#201e1d;background:transparent;border:none;border-left:3px solid transparent;padding:10px 12px;margin-bottom:4px;text-align:left';
+const MENU_BTN_ACTIVE = 'display:flex;align-items:center;cursor:pointer;font-weight:800;font-size:14px;color:#ae1800;background:#fff2ef;border:none;border-left:3px solid #ec3013;padding:10px 12px;margin-bottom:4px;text-align:left';
+const INPUT_OK = "width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.4)";
+const INPUT_ERR = "width:100%;min-height:36px;padding:6px 10px;font-size:14px;color:#201e1d;background:#eae9e9;border:1px solid #ec3013";
+
+class Component extends DCLogic {
+  state = {
+    view: this.props.initialView === 'login' ? 'login' : 'landing',
+    students: generateStudents(40),
+    session: null,
+    fKota: '', fDari: '', fSampai: '', fGender: 'ALL', landingPage: 1,
+    loginUser: '', loginPass: '', loginError: '',
+    boPage: 1, boSearch: '', deleteTarget: null, logoutConfirm: false,
+    formData: null, formErrors: {}, showExtra: false,
+  };
+
+  gotoLanding = () => this.setState({ view: 'landing' });
+  gotoLogin = () => this.setState({ view: 'login', loginError: '' });
+  gotoWelcome = () => this.setState({ view: 'welcome' });
+  openGrid = () => this.setState({ view: 'grid' });
+
+  setFKota = (e) => this.setState({ fKota: e.target.value, landingPage: 1 });
+  setFDari = (e) => this.setState({ fDari: e.target.value, landingPage: 1 });
+  setFSampai = (e) => this.setState({ fSampai: e.target.value, landingPage: 1 });
+  setFGenderAll = () => this.setState({ fGender: 'ALL', landingPage: 1 });
+  setFGenderL = () => this.setState({ fGender: 'L', landingPage: 1 });
+  setFGenderP = () => this.setState({ fGender: 'P', landingPage: 1 });
+  resetFilters = () => this.setState({ fKota: '', fDari: '', fSampai: '', fGender: 'ALL', landingPage: 1 });
+
+  setLoginUser = (e) => this.setState({ loginUser: e.target.value });
+  setLoginPass = (e) => this.setState({ loginPass: e.target.value });
+  doLogin = (e) => {
+    e.preventDefault();
+    if (this.state.loginUser === 'admin' && this.state.loginPass === 'admin123') {
+      this.setState({ session: { name: 'Budi Santoso' }, view: 'welcome', loginError: '', loginUser: '', loginPass: '' });
+    } else {
+      this.setState({ loginError: 'Username atau password salah.' });
+    }
+  };
+  doLogout = () => this.setState({ session: null, view: 'login', loginUser: '', loginPass: '', loginError: '', logoutConfirm: false });
+  askLogout = () => this.setState({ logoutConfirm: true });
+  cancelLogout = () => this.setState({ logoutConfirm: false });
+
+  setBoSearch = (e) => this.setState({ boSearch: e.target.value, boPage: 1 });
+  openAdd = () => this.setState({ formData: emptyForm(), formErrors: {}, showExtra: false, view: 'form' });
+  openEdit = (s) => this.setState({ formData: Object.assign({}, s), formErrors: {}, showExtra: false, view: 'form' });
+  askDelete = (s) => this.setState({ deleteTarget: s });
+  cancelDelete = () => this.setState({ deleteTarget: null });
+  confirmDelete = () => {
+    const id = this.state.deleteTarget.id;
+    this.setState((st) => ({ students: st.students.filter((s) => s.id !== id), deleteTarget: null }));
+  };
+  setFormGenderL = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { jenisKelamin: 'L' }) }));
+  setFormGenderP = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { jenisKelamin: 'P' }) }));
+  setFormPhoto = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.setState((st) => ({ formData: Object.assign({}, st.formData, { foto: reader.result }) }));
+    reader.readAsDataURL(file);
+  };
+  toggleExtra = () => this.setState((st) => ({ showExtra: !st.showExtra }));
+  cancelForm = () => this.setState({ view: 'grid', formData: null });
+  saveForm = (e) => {
+    e.preventDefault();
+    const f = this.state.formData;
+    const errors = {};
+    if (!f.nama || !f.nama.trim()) errors.nama = true;
+    if (!f.tempatLahir || !f.tempatLahir.trim()) errors.tempatLahir = true;
+    if (!f.tanggalLahir) errors.tanggalLahir = true;
+    if (Object.keys(errors).length) { this.setState({ formErrors: errors }); return; }
+    this.setState((st) => {
+      let students;
+      if (f.id) {
+        students = st.students.map((s) => (s.id === f.id ? f : s));
+      } else {
+        const nextId = st.students.reduce((m, s) => Math.max(m, s.id), 0) + 1;
+        students = [Object.assign({}, f, { id: nextId }), ...st.students];
+      }
+      return { students, view: 'grid', formData: null, boPage: 1 };
+    });
+  };
+
+  renderVals() {
+    const st = this.state;
+    const boPageSize = this.props.boPageSize || 10;
+    const showLoginHint = this.props.showLoginHint !== false;
+
+    const filtered = st.students.filter((s) => {
+      if (st.fKota && s.tempatLahir !== st.fKota) return false;
+      if (st.fGender !== 'ALL' && s.jenisKelamin !== st.fGender) return false;
+      if (st.fDari && s.tanggalLahir < st.fDari) return false;
+      if (st.fSampai && s.tanggalLahir > st.fSampai) return false;
+      return true;
+    });
+    const pageSize = 20;
+    const totalPagesLanding = Math.max(1, Math.ceil(filtered.length / pageSize));
+    const curLandingPage = Math.min(st.landingPage, totalPagesLanding);
+    const pagedLanding = filtered.slice((curLandingPage - 1) * pageSize, curLandingPage * pageSize).map((s) => ({
+      id: s.id, nama: s.nama, tempatLahir: s.tempatLahir,
+      tanggalLahirLabel: formatDate(s.tanggalLahir),
+      jenisKelaminLabel: s.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+    }));
+    const cities = Array.from(new Set(st.students.map((s) => s.tempatLahir))).sort();
+    const landingPages = Array.from({ length: totalPagesLanding }, (_, i) => {
+      const p = i + 1;
+      return { page: p, onClick: () => this.setState({ landingPage: p }), style: p === curLandingPage ? PAGE_BTN_ACTIVE : PAGE_BTN };
+    });
+
+    const q = (st.boSearch || '').trim().toLowerCase();
+    const boFiltered = !q ? st.students : st.students.filter((s) => {
+      const genderLabel = s.jenisKelamin === 'L' ? 'laki-laki' : 'perempuan';
+      return s.nama.toLowerCase().includes(q) || s.tempatLahir.toLowerCase().includes(q) ||
+        formatDate(s.tanggalLahir).toLowerCase().includes(q) || s.jenisKelamin.toLowerCase().includes(q) || genderLabel.includes(q);
+    });
+    const totalPagesBo = Math.max(1, Math.ceil(boFiltered.length / boPageSize));
+    const curBoPage = Math.min(st.boPage, totalPagesBo);
+    const pagedBo = boFiltered.slice((curBoPage - 1) * boPageSize, curBoPage * boPageSize).map((s) => ({
+      id: s.id, nama: s.nama, tempatLahir: s.tempatLahir, jenisKelamin: s.jenisKelamin,
+      tanggalLahirLabel: formatDate(s.tanggalLahir),
+      onEdit: () => this.openEdit(s), onDelete: () => this.askDelete(s),
+    }));
+    const boPages = Array.from({ length: totalPagesBo }, (_, i) => {
+      const p = i + 1;
+      return { page: p, onClick: () => this.setState({ boPage: p }), style: p === curBoPage ? PAGE_BTN_ACTIVE : PAGE_BTN };
+    });
+
+    const fields = ['nis', 'nisn', 'agama', 'kewarganegaraan', 'anakKe', 'jumlahSaudara', 'telepon', 'email', 'alamat', 'namaAyah', 'namaIbu', 'pekerjaanAyah', 'pekerjaanIbu', 'hobi', 'riwayatFormal', 'riwayatInformal'];
+    const fset = {};
+    fields.forEach((f) => { fset[f] = (e) => { const v = e && e.target ? e.target.value : e; this.setState((s) => ({ formData: Object.assign({}, s.formData, { [f]: v }) })); }; });
+    fset.nama = (e) => this.setState((s) => ({ formData: Object.assign({}, s.formData, { nama: e.target.value }) }));
+    fset.tempatLahir = (e) => this.setState((s) => ({ formData: Object.assign({}, s.formData, { tempatLahir: e.target.value }) }));
+    fset.tanggalLahir = (e) => this.setState((s) => ({ formData: Object.assign({}, s.formData, { tanggalLahir: e.target.value }) }));
+
+    return {
+      isLanding: st.view === 'landing',
+      isLogin: st.view === 'login',
+      isAdminArea: st.view === 'welcome' || st.view === 'grid' || st.view === 'form',
+      isWelcome: st.view === 'welcome',
+      isGrid: st.view === 'grid',
+      isForm: st.view === 'form',
+      gotoLanding: this.gotoLanding, gotoLogin: this.gotoLogin, gotoWelcome: this.gotoWelcome, openGrid: this.openGrid,
+      sessionName: st.session ? st.session.name : 'Admin',
+      menuStudentStyle: (st.view === 'grid' || st.view === 'form') ? MENU_BTN_ACTIVE : MENU_BTN,
+      menuWelcomeStyle: st.view === 'welcome' ? MENU_BTN_ACTIVE : MENU_BTN,
+      doLogout: this.doLogout, askLogout: this.askLogout, cancelLogout: this.cancelLogout,
+      logoutConfirm: st.logoutConfirm,
+
+      cities, fKota: st.fKota, fDari: st.fDari, fSampai: st.fSampai,
+      setFKota: this.setFKota, setFDari: this.setFDari, setFSampai: this.setFSampai,
+      setFGenderAll: this.setFGenderAll, setFGenderL: this.setFGenderL, setFGenderP: this.setFGenderP,
+      segAllStyle: st.fGender === 'ALL' ? SEG_ACTIVE : SEG_BASE,
+      segLStyle: st.fGender === 'L' ? SEG_ACTIVE : SEG_BASE,
+      segPStyle: st.fGender === 'P' ? SEG_ACTIVE : SEG_BASE,
+      resetFilters: this.resetFilters,
+      pagedLanding, landingPages, filteredCount: filtered.length, totalCount: st.students.length,
+
+      loginUser: st.loginUser, loginPass: st.loginPass, loginError: st.loginError,
+      setLoginUser: this.setLoginUser, setLoginPass: this.setLoginPass, doLogin: this.doLogin,
+      showLoginHint,
+
+      pagedBo, boPages, boSearch: st.boSearch, setBoSearch: this.setBoSearch, boFilteredCount: boFiltered.length,
+      openAdd: this.openAdd,
+      deleteTarget: st.deleteTarget, deleteTargetName: st.deleteTarget ? st.deleteTarget.nama : '',
+      cancelDelete: this.cancelDelete, confirmDelete: this.confirmDelete,
+
+      formData: st.formData || emptyForm(),
+      formPhotoEmpty: !(st.formData && st.formData.foto),
+      formTitle: st.formData && st.formData.id ? 'Edit Data Siswa' : 'Tambah Siswa Baru',
+      inputStyleNama: st.formErrors.nama ? INPUT_ERR : INPUT_OK,
+      inputStyleTempatLahir: st.formErrors.tempatLahir ? INPUT_ERR : INPUT_OK,
+      inputStyleTanggalLahir: st.formErrors.tanggalLahir ? INPUT_ERR : INPUT_OK,
+      formGenderLStyle: st.formData && st.formData.jenisKelamin === 'L' ? SEG_ACTIVE.replace('flex:1', 'flex:1') : SEG_BASE,
+      formGenderPStyle: st.formData && st.formData.jenisKelamin === 'P' ? SEG_ACTIVE.replace('flex:1', 'flex:1') : SEG_BASE,
+      setFormGenderL: this.setFormGenderL, setFormGenderP: this.setFormGenderP,
+      setFormPhoto: this.setFormPhoto,
+      showExtra: st.showExtra, toggleExtra: this.toggleExtra,
+      extraToggleLabel: st.showExtra ? 'Sembunyikan Data Tambahan ▴' : 'Tampilkan Data Tambahan (opsional) ▾',
+      religions: RELIGIONS,
+      fset,
+      cancelForm: this.cancelForm, saveForm: this.saveForm,
+    };
+  }
+}
+</script>
+</body>
+</html>

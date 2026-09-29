@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-a7a6c075-f7bf-4056-b98c-4b6d0d4420da/styles.css" />
+<script src="_ds/modernist-a7a6c075-f7bf-4056-b98c-4b6d0d4420da/_ds_bundle.js"></script>
+<title>Direktori Siswa — Mobile</title>
+<style>
+  body { margin: 0; background: var(--color-bg); }
+  * { box-sizing: border-box; }
+</style>
+</helmet>
+
+<div style="width:390px;min-height:844px;background:var(--color-bg);display:flex;flex-direction:column;font-family:var(--font-body)">
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;flex:1">
+  <div style="padding:20px 16px 14px;border-bottom:2px solid var(--color-divider)">
+    <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;color:var(--color-text);letter-spacing:-0.01em">Direktori Siswa</div>
+    <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-top:2px">Data Publik &middot; Read-only</div>
+  </div>
+
+  <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--color-divider)">
+    <div style="display:flex;gap:8px">
+      <input type="text" value="{{ search }}" onChange="{{ setSearch }}" placeholder="Cari nama atau tempat lahir..." class="input" style="flex:1" />
+      <button type="button" onClick="{{ toggleFilters }}" aria-label="Filter" class="{{ filterBtnClass }}" style="flex:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </button>
+    </div>
+    <div class="seg" role="radiogroup" style="width:100%">
+      <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="gender" checked="{{ genderAllChecked }}" onChange="{{ setGenderAll }}" />Semua</label>
+      <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="gender" checked="{{ genderLChecked }}" onChange="{{ setGenderL }}" />Laki-laki</label>
+      <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="gender" checked="{{ genderPChecked }}" onChange="{{ setGenderP }}" />Perempuan</label>
+    </div>
+    <sc-if value="{{ showFilters }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px;padding-top:4px;border-top:1px solid var(--color-divider)">
+        <div class="field">
+          <label>Tempat Lahir</label>
+          <select class="input" value="{{ fKota }}" onChange="{{ setFKota }}">
+            <option value="">Semua Kota</option>
+            <sc-for list="{{ cities }}" as="c" hint-placeholder-count="5"><option value="{{ c }}">{{ c }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="field" style="flex:1">
+            <label>Dari Tanggal</label>
+            <input type="date" class="input" value="{{ fDari }}" onChange="{{ setFDari }}" />
+          </div>
+          <div class="field" style="flex:1">
+            <label>Sampai Tanggal</label>
+            <input type="date" class="input" value="{{ fSampai }}" onChange="{{ setFSampai }}" />
+          </div>
+        </div>
+        <button type="button" onClick="{{ resetFilters }}" class="btn btn-secondary btn-block">Reset Filter</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="padding:10px 16px;font-size:12px;color:var(--color-neutral-700)">Menampilkan {{ filteredCount }} dari {{ totalCount }} siswa</div>
+
+  <div style="flex:1;display:flex;flex-direction:column;overflow:auto">
+    <sc-for list="{{ paged }}" as="item" hint-placeholder-count="6">
+      <div onClick="{{ item.onOpen }}" style="display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+        <div style="width:52px;height:52px;flex:none;background:repeating-linear-gradient(135deg,var(--color-neutral-400),var(--color-neutral-400) 6px,var(--color-neutral-200) 6px,var(--color-neutral-200) 12px);border:1px solid var(--color-divider)"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:15px;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.nama }}</div>
+          <div style="font-size:12px;color:var(--color-neutral-700);margin-top:2px">{{ item.tempatLahir }} &middot; {{ item.tanggalLahirLabel }}</div>
+        </div>
+        <span class="{{ item.tagClass }}" style="flex:none;font-size:10px">{{ item.jenisKelaminLabel }}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:var(--color-neutral-700)"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </sc-for>
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:40px 16px;text-align:center;font-size:13px;color:var(--color-neutral-700)">Tidak ada siswa yang cocok.</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:14px 16px;border-top:2px solid var(--color-divider)">
+      <button type="button" onClick="{{ loadMore }}" class="btn btn-secondary btn-block">Muat Lebih Banyak</button>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;flex:1">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px;border-bottom:2px solid var(--color-divider)">
+    <button type="button" onClick="{{ closeDetail }}" aria-label="Kembali" class="btn btn-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div style="font-family:var(--font-heading);font-weight:800;font-size:16px;color:var(--color-text)">Detail Siswa</div>
+  </div>
+
+  <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;border-bottom:2px solid var(--color-divider)">
+    <div style="width:96px;height:96px;background:repeating-linear-gradient(135deg,var(--color-neutral-400),var(--color-neutral-400) 8px,var(--color-neutral-200) 8px,var(--color-neutral-200) 16px);border:1px solid var(--color-divider)"></div>
+    <div style="text-align:center">
+      <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;color:var(--color-text)">{{ detail.nama }}</div>
+      <span class="{{ detail.tagClass }}" style="margin-top:6px;display:inline-flex">{{ detail.jenisKelaminLabel }}</span>
+    </div>
+  </div>
+
+  <div style="padding:8px 16px;display:flex;flex-direction:column">
+    <sc-for list="{{ detailFields }}" as="f" hint-placeholder-count="4">
+      <div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--color-divider)">
+        <span style="font-size:13px;color:var(--color-neutral-700)">{{ f.label }}</span>
+        <span style="font-size:13px;font-weight:600;color:var(--color-text);text-align:right">{{ f.value }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;sampleCount&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:40,&quot;min&quot;:10,&quot;max&quot;:60,&quot;step&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Data&quot;}}">
+const MALE_NAMES = ['Andi','Budi','Rizki','Fajar','Bayu','Dimas','Agus','Hendra','Yusuf','Fadli','Arya','Wahyu','Rian','Doni','Eko'];
+const FEMALE_NAMES = ['Siti','Putri','Ayu','Rina','Dewi','Fitri','Wulan','Nadia','Indah','Sri','Maya','Lestari','Ratna','Yuni','Intan'];
+const LAST_NAMES = ['Saputra','Wijaya','Kurniawan','Pratama','Santoso','Hidayat','Nugroho','Setiawan','Firmansyah','Susanto','Permadi','Gunawan','Yulianto','Rahmawati','Anggraini'];
+const CITIES = ['Jakarta','Surabaya','Bandung','Medan','Semarang','Makassar','Palembang','Yogyakarta','Malang','Denpasar','Bekasi','Depok'];
+const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function randDate(seed) {
+  const year = 2013 + (seed % 5);
+  const month = 1 + ((seed * 3) % 12);
+  const day = 1 + ((seed * 7) % 28);
+  return year + '-' + pad(month) + '-' + pad(day);
+}
+function formatDate(iso) {
+  const parts = iso.split('-');
+  return parseInt(parts[2], 10) + ' ' + MONTHS[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+}
+function generateStudents(n) {
+  const list = [];
+  for (let i = 1; i <= n; i++) {
+    const gender = i % 2 === 0 ? 'P' : 'L';
+    const first = gender === 'L' ? MALE_NAMES[i % MALE_NAMES.length] : FEMALE_NAMES[i % FEMALE_NAMES.length];
+    const last = LAST_NAMES[(i * 3) % LAST_NAMES.length];
+    list.push({ id: i, nama: first + ' ' + last, tempatLahir: CITIES[i % CITIES.length], tanggalLahir: randDate(i), jenisKelamin: gender });
+  }
+  return list;
+}
+
+class Component extends DCLogic {
+  state = { students: generateStudents(this.props.sampleCount || 40), search: '', gender: 'ALL', visible: 15, detailId: null, showFilters: false, fKota: '', fDari: '', fSampai: '' };
+
+  toggleFilters = () => this.setState((s) => ({ showFilters: !s.showFilters }));
+  setFKota = (e) => this.setState({ fKota: e.target.value, visible: 15 });
+  setFDari = (e) => this.setState({ fDari: e.target.value, visible: 15 });
+  setFSampai = (e) => this.setState({ fSampai: e.target.value, visible: 15 });
+  resetFilters = () => this.setState({ fKota: '', fDari: '', fSampai: '', gender: 'ALL', search: '', visible: 15 });
+
+  openDetail = (id) => this.setState({ detailId: id });
+  closeDetail = () => this.setState({ detailId: null });
+
+  setSearch = (e) => this.setState({ search: e.target.value, visible: 15 });
+  setGenderAll = () => this.setState({ gender: 'ALL', visible: 15 });
+  setGenderL = () => this.setState({ gender: 'L', visible: 15 });
+  setGenderP = () => this.setState({ gender: 'P', visible: 15 });
+  loadMore = () => this.setState((s) => ({ visible: s.visible + 15 }));
+
+  renderVals() {
+    const st = this.state;
+    const q = st.search.trim().toLowerCase();
+    const filtered = st.students.filter((s) => {
+      if (st.gender !== 'ALL' && s.jenisKelamin !== st.gender) return false;
+      if (q && !s.nama.toLowerCase().includes(q) && !s.tempatLahir.toLowerCase().includes(q)) return false;
+      if (st.fKota && s.tempatLahir !== st.fKota) return false;
+      if (st.fDari && s.tanggalLahir < st.fDari) return false;
+      if (st.fSampai && s.tanggalLahir > st.fSampai) return false;
+      return true;
+    });
+    const cities = Array.from(new Set(st.students.map((s) => s.tempatLahir))).sort();
+    const activeFilterCount = (st.fKota ? 1 : 0) + (st.fDari ? 1 : 0) + (st.fSampai ? 1 : 0);
+    const paged = filtered.slice(0, st.visible).map((s) => ({
+      id: s.id, nama: s.nama, tempatLahir: s.tempatLahir,
+      tanggalLahirLabel: formatDate(s.tanggalLahir),
+      jenisKelaminLabel: s.jenisKelamin === 'L' ? 'L' : 'P',
+      tagClass: s.jenisKelamin === 'L' ? 'tag tag-neutral' : 'tag tag-accent',
+      onOpen: () => this.openDetail(s.id),
+    }));
+    const detailSrc = st.detailId ? st.students.find((s) => s.id === st.detailId) : null;
+    const detail = detailSrc ? {
+      nama: detailSrc.nama,
+      jenisKelaminLabel: detailSrc.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+      tagClass: detailSrc.jenisKelamin === 'L' ? 'tag tag-neutral' : 'tag tag-accent',
+    } : { nama: '', jenisKelaminLabel: '', tagClass: 'tag tag-neutral' };
+    const detailFields = detailSrc ? [
+      { label: 'Tempat Lahir', value: detailSrc.tempatLahir },
+      { label: 'Tanggal Lahir', value: formatDate(detailSrc.tanggalLahir) },
+      { label: 'Jenis Kelamin', value: detailSrc.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan' },
+    ] : [];
+    return {
+      isList: !st.detailId, isDetail: !!st.detailId,
+      detail, detailFields, closeDetail: this.closeDetail,
+      search: st.search, setSearch: this.setSearch,
+      setGenderAll: this.setGenderAll, setGenderL: this.setGenderL, setGenderP: this.setGenderP,
+      genderAllChecked: st.gender === 'ALL',
+      genderLChecked: st.gender === 'L',
+      genderPChecked: st.gender === 'P',
+      showFilters: st.showFilters, toggleFilters: this.toggleFilters,
+      filterBtnClass: 'btn btn-icon' + (activeFilterCount > 0 ? ' btn-primary' : ' btn-secondary'),
+      cities, fKota: st.fKota, fDari: st.fDari, fSampai: st.fSampai,
+      setFKota: this.setFKota, setFDari: this.setFDari, setFSampai: this.setFSampai, resetFilters: this.resetFilters,
+      paged, filteredCount: filtered.length, totalCount: st.students.length,
+      isEmpty: filtered.length === 0,
+      hasMore: st.visible < filtered.length,
+      loadMore: this.loadMore,
+    };
+  }
+}
+</script>
+</body>
+</html>

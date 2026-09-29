@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direktori Siswa</title>
+<meta name="description" content="Direktori data siswa — daftar publik (read-only).">
+<meta name="theme-color" content="#1f5bd6">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/app.css">
+</head>
+<body>
+<div class="page">
+  <!-- ============ DESKTOP (PRD 4.1) ============ -->
+  <div id="desk" class="page" hidden>
+    <header class="pub-header">
+      <a class="pub-brand" href="/"><span class="mark" aria-hidden="true"></span>Direktori Siswa</a>
+      <span class="pub-kicker">Data Publik &middot; Read-only</span>
+    </header>
+
+    <form class="filter-bar" id="d-filter" onsubmit="return false">
+      <div class="field">
+        <label for="d-kota">Tempat Lahir</label>
+        <select id="d-kota" class="input"><option value="">Semua Kota</option></select>
+      </div>
+      <div class="field">
+        <label for="d-dari">Tanggal Lahir — Dari</label>
+        <input id="d-dari" type="date" class="input">
+      </div>
+      <div class="field">
+        <label for="d-sampai">Tanggal Lahir — Sampai</label>
+        <input id="d-sampai" type="date" class="input">
+      </div>
+      <div class="field">
+        <span class="label" id="d-jk-l">Jenis Kelamin</span>
+        <div class="seg" role="radiogroup" aria-labelledby="d-jk-l">
+          <label class="seg-opt"><input type="radio" name="d-jk" value="ALL" checked>Semua</label>
+          <label class="seg-opt"><input type="radio" name="d-jk" value="L">Laki-laki</label>
+          <label class="seg-opt"><input type="radio" name="d-jk" value="P">Perempuan</label>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary" id="d-reset">Reset</button>
+    </form>
+
+    <div class="result-count" id="d-count" aria-live="polite">Memuat…</div>
+    <main class="card-grid" id="d-grid"></main>
+    <nav class="pager pub-pager" id="d-pager" aria-label="Halaman"></nav>
+    <footer class="pub-footer">Direktori Siswa &middot; Data ditampilkan untuk publik</footer>
+  </div>
+
+  <!-- ============ MOBILE (PRD 4.1.1) ============ -->
+  <div id="mob" class="page" hidden>
+    <header class="m-head">
+      <div class="m-title">Direktori Siswa</div>
+      <div class="m-kicker">Data Publik &middot; Read-only</div>
+    </header>
+    <div class="m-tools">
+      <div class="m-search">
+        <label for="m-q" class="sr-only">Cari</label>
+        <input id="m-q" type="search" class="input" placeholder="Cari nama atau tempat lahir..." autocomplete="off">
+        <button type="button" id="m-ftoggle" class="btn btn-icon btn-secondary" aria-label="Filter" aria-expanded="false" aria-controls="m-filters"></button>
+      </div>
+      <div class="seg" role="radiogroup" aria-label="Jenis kelamin">
+        <label class="seg-opt"><input type="radio" name="m-jk" value="ALL" checked>Semua</label>
+        <label class="seg-opt"><input type="radio" name="m-jk" value="L">Laki-laki</label>
+        <label class="seg-opt"><input type="radio" name="m-jk" value="P">Perempuan</label>
+      </div>
+      <div class="m-filters" id="m-filters" hidden>
+        <div class="field">
+          <label for="m-kota">Tempat Lahir</label>
+          <select id="m-kota" class="input"><option value="">Semua Kota</option></select>
+        </div>
+        <div class="m-row2">
+          <div class="field"><label for="m-dari">Dari Tanggal</label><input id="m-dari" type="date" class="input"></div>
+          <div class="field"><label for="m-sampai">Sampai Tanggal</label><input id="m-sampai" type="date" class="input"></div>
+        </div>
+        <button type="button" id="m-reset" class="btn btn-secondary btn-block">Reset Filter</button>
+      </div>
+    </div>
+    <div class="m-count" id="m-count" aria-live="polite">Memuat…</div>
+    <main id="m-list" style="flex:1"></main>
+    <div class="m-more" id="m-more" hidden>
+      <button type="button" id="m-more-btn" class="btn btn-secondary btn-block">Muat Lebih Banyak</button>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/common.js"></script>
+<script src="/assets/js/landing.js"></script>
+</body>
+</html>
