@@ -114,7 +114,10 @@
     const st = { q: params.get('q') || '', page: Math.max(1, parseInt(params.get('page'), 10) || 1) };
     const main = shell('siswa', `
       <div class="bo-titlebar"><h1>Manajemen Siswa</h1>
-        <a href="${ADMIN_PATH}/siswa/baru" data-nav="/siswa/baru" class="btn btn-primary">${icon('plus')} Add</a></div>
+        <div class="bo-titlebar-actions">
+          <a href="${ADMIN_PATH}/cetak/siswa" id="print-list" target="_blank" rel="noopener" class="btn btn-secondary" title="Cetak daftar siswa (sesuai pencarian) ke PDF">${icon('printer')} Cetak PDF</a>
+          <a href="${ADMIN_PATH}/siswa/baru" data-nav="/siswa/baru" class="btn btn-primary">${icon('plus')} Add</a>
+        </div></div>
       <div class="bo-search"><label for="q" class="sr-only">Cari</label>
         <input id="q" type="search" class="input" placeholder="Cari nama, tempat lahir, tanggal lahir, J.K..." value="${esc(st.q)}" autocomplete="off"></div>
       <div class="bo-count" id="count" aria-live="polite">Memuat…</div>
@@ -141,6 +144,7 @@
             <td>${esc(formatDate(s.tanggalLahir))}</td>
             <td class="hide-sm">${esc(s.jenisKelamin)}</td>
             <td class="bo-actions">
+              <a href="${ADMIN_PATH}/cetak/siswa/${s.id}" target="_blank" rel="noopener" class="btn btn-secondary btn-icon-sm" aria-label="Cetak biodata ${esc(s.nama)} ke PDF" title="Cetak biodata (PDF)">${icon('printer')}</a>
               <a href="${ADMIN_PATH}/siswa/${s.id}/edit" data-nav="/siswa/${s.id}/edit" class="btn btn-secondary btn-icon-sm" aria-label="Edit ${esc(s.nama)}" title="Edit">${icon('edit')}</a>
               <button type="button" class="btn btn-secondary btn-icon-sm btn-danger" data-del="${s.id}" data-name="${esc(s.nama)}" aria-label="Delete ${esc(s.nama)}" title="Delete">${icon('trash')}</button>
             </td></tr>`).join('')
@@ -148,6 +152,8 @@
         main.querySelector('#pager').innerHTML = pagerHtml(r.page, r.pages);
         const search = qs({ q: st.q.trim(), page: st.page > 1 ? st.page : '' });
         lastGrid = '/siswa' + (search ? '?' + search : '');
+        const printQs = qs({ q: st.q.trim() });
+        main.querySelector('#print-list').href = `${ADMIN_PATH}/cetak/siswa${printQs ? '?' + printQs : ''}`;
         history.replaceState(null, '', ADMIN_PATH + lastGrid);
       } catch (err) {
         if (id === reqId && err.status !== 401) $rows.innerHTML = `<tr><td colspan="6"><div class="empty">Gagal memuat data: ${esc(err.message)}</div></td></tr>`;

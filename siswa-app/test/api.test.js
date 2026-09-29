@@ -99,6 +99,19 @@ test('CRUD: validasi, tambah, ubah, hapus', async () => {
   assert.equal((await call('GET', `/api/public/siswa/${id}`)).status, 404);
 });
 
+test('data cetak PDF: semua hasil pencarian, halaman cetak dijaga sesi', async () => {
+  const r = await call('GET', '/api/admin/cetak/siswa?q=bandung');
+  assert.equal(r.status, 200);
+  assert.ok(r.data.total > 0);
+  assert.equal(r.data.items.length, r.data.total, 'tidak dipaging');
+  assert.ok(r.data.items.every((s) => s.tempatLahir === 'Bandung' && 'nis' in s));
+  const all = await call('GET', '/api/admin/cetak/siswa');
+  assert.equal(all.data.items.length, 45);
+  assert.equal((await call('GET', ADMIN_PATH + '/cetak/siswa/1')).status, 200);
+  assert.equal((await call('GET', ADMIN_PATH + '/cetak/siswa', null, { noCookie: true })).status, 302);
+  assert.equal((await call('GET', '/api/admin/cetak/siswa', null, { noCookie: true })).status, 401);
+});
+
 test('logout menghapus sesi', async () => {
   const old = cookie;
   assert.equal((await call('POST', '/api/auth/logout')).status, 200);

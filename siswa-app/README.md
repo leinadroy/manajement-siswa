@@ -23,6 +23,12 @@ Akun admin awal: **admin / admin123** (nama "Budi Santoso"). Ganti sebelum dipak
 
 Saat start pertama, database `data/siswa.db` dan 60 data siswa contoh (dengan foto avatar) dibuat otomatis.
 
+## Cetak ke PDF (modul Manajemen Siswa)
+- **Daftar siswa:** tombol **Cetak PDF** di halaman Manajemen Siswa mencetak *semua* data yang cocok dengan pencarian (bukan hanya halaman yang tampil), maksimal 2.000 baris. Di aplikasi mobile, ikon printer di sebelah tombol Add memakai search + filter yang aktif.
+- **Biodata per siswa:** ikon printer di kolom Aksi (desktop) atau tombol **Cetak Biodata (PDF)** di halaman Detail (mobile).
+- Halaman cetak terbuka di tab baru dan dialog Print muncul otomatis; pilih tujuan **Save as PDF / Simpan sebagai PDF**. Nama file default: `Daftar Siswa - YYYY-MM-DD` atau `Biodata Siswa - <nama>`.
+- Format A4 dengan nomor halaman dan kop tabel yang berulang di setiap halaman. URL: `/backoffice/cetak/siswa?q=...` dan `/backoffice/cetak/siswa/<id>` (wajib login). Tambah `&auto=0` untuk membuka pratinjau tanpa dialog Print.
+
 ## Perintah
 | Perintah | Fungsi |
 | --- | --- |
@@ -50,9 +56,10 @@ src/auth.js          Login/logout/validasi sesi kustom (pengganti GAM)
 src/crypto.js        Hash password scrypt
 src/siswa.js         Query list/filter/search/paging, validasi, foto
 src/routes/          API: public.js, auth.js, admin.js
-views/               index.html, siswa.html, admin.html, mobile.html
+views/               index.html, siswa.html, admin.html, mobile.html, cetak.html
 public/css/app.css   Design tokens biru-putih + komponen
-public/js/           common.js, landing.js, form.js, admin.js, mobile.js
+public/js/           common.js, landing.js, form.js, admin.js, mobile.js, cetak.js
+public/css/print.css Tata letak cetak A4
 test/api.test.js     Uji otomatis
 ```
 

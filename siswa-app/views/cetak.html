@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="admin-path" content="%ADMIN_PATH%">
+<title>Cetak — Manajemen Siswa</title>
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="/assets/css/print.css">
+</head>
+<body class="print-body">
+  <div class="print-toolbar" role="toolbar" aria-label="Cetak">
+    <button type="button" class="btn btn-secondary" id="close"></button>
+    <div class="print-toolbar-title" id="tb-title">Menyiapkan dokumen…</div>
+    <span class="print-hint">Di dialog cetak, pilih tujuan <b>Simpan sebagai PDF</b>.</span>
+    <button type="button" class="btn btn-primary" id="print" disabled></button>
+  </div>
+  <main class="paper" id="paper"><div class="empty">Memuat data…</div></main>
+<script src="/assets/js/common.js"></script>
+<script src="/assets/js/cetak.js"></script>
+</body>
+</html>

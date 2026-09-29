@@ -87,6 +87,15 @@ function list(q, { full = false, order = 'nama' } = {}) {
   return { items: rows.map((r) => toApi(r, full)), total, totalAll, page, pages, size };
 }
 
+// Semua data yang cocok (untuk cetak PDF), dibatasi agar tetap ringan.
+const PRINT_LIMIT = 2000;
+function listForPrint(q) {
+  const { sql, params } = buildWhere({ ...q, searchScope: 'admin' });
+  const total = db.prepare(`SELECT COUNT(*) AS n FROM siswa ${sql}`).get(...params).n;
+  const rows = db.prepare(`SELECT * FROM siswa ${sql} ORDER BY nama COLLATE NOCASE ASC, id ASC LIMIT ?`).all(...params, PRINT_LIMIT);
+  return { items: rows.map((r) => toApi(r, true)), total, limit: PRINT_LIMIT, truncated: total > PRINT_LIMIT };
+}
+
 function get(id, full) {
   const row = db.prepare(`SELECT ${full ? '*' : PUBLIC_COLS} FROM siswa WHERE id = ?`).get(Number(id));
   return toApi(row, full);
@@ -182,4 +191,4 @@ function remove(id) {
   return true;
 }
 
-module.exports = { list, get, cities, count, create, update, remove };
+module.exports = { list, listForPrint, get, cities, count, create, update, remove };

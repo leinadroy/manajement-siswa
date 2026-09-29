@@ -9,6 +9,9 @@ router.use(requireApiAuth);
 router.get('/stats', (_req, res) => res.json({ totalSiswa: siswa.count() }));
 router.get('/kota', (_req, res) => res.json(siswa.cities()));
 
+// Data untuk halaman cetak PDF: daftar (sesuai pencarian/filter) & biodata.
+router.get('/cetak/siswa', (req, res) => res.json(siswa.listForPrint(req.query)));
+
 router.get('/siswa', (req, res) => {
   const q = { ...req.query, searchScope: 'admin' };
   res.json(siswa.list(q, { full: false, order: 'newest' }));

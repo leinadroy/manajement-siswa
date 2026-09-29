@@ -247,13 +247,14 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 .bo-main { flex: 1; padding: 40px; min-width: 0; overflow: auto; }
 .bo-titlebar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 .bo-titlebar h1 { font-size: 24px; margin: 0; }
-.bo-titlebar .btn { margin-left: auto; }
+.bo-titlebar-actions { margin-left: auto; display: flex; gap: 8px; }
 .bo-search { max-width: 360px; margin-bottom: 16px; }
 .bo-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 .bo-table .photo { width: 36px; height: 36px; border: 0; }
 .bo-table td.name { font-weight: 600; }
 .bo-actions { text-align: right; white-space: nowrap; }
 .bo-actions .btn + .btn { margin-left: 6px; }
+.bo-table th:last-child { width: 132px; }
 .bo-pager { padding-top: 20px; }
 
 .welcome { max-width: 560px; }

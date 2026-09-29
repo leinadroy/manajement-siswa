@@ -59,6 +59,9 @@ const guardPage = (req, res, next) => {
 app.get([ADMIN_PATH, `${ADMIN_PATH}/siswa`, `${ADMIN_PATH}/siswa/baru`, `${ADMIN_PATH}/siswa/:id/edit`],
   guardPage, (_req, res) => sendView(res, 'admin.html'));
 
+// Halaman cetak (Print → Simpan sebagai PDF): daftar siswa & biodata per siswa.
+app.get([`${ADMIN_PATH}/cetak/siswa`, `${ADMIN_PATH}/cetak/siswa/:id`], guardPage, (_req, res) => sendView(res, 'cetak.html'));
+
 // Aplikasi mobile admin (PRD 4.7) — satu halaman; view login/app ditentukan oleh /api/auth/me.
 app.get(`${ADMIN_PATH}/m`, (_req, res) => sendView(res, 'mobile.html'));
 app.get(`${ADMIN_PATH}/m/manifest.webmanifest`, (_req, res) => {

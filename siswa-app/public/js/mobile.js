@@ -123,7 +123,8 @@
           <button type="button" id="reset" class="btn btn-secondary btn-block">Reset Filter</button>
         </div>
         <div class="m-add-row"><span id="count">Memuat…</span>
-          <button type="button" id="add" class="btn btn-primary">${icon('plus')} Add</button></div>
+          <span style="display:flex;gap:8px"><a id="print" class="btn btn-secondary btn-icon" target="_blank" rel="noopener" aria-label="Cetak daftar ke PDF" title="Cetak daftar (PDF)">${icon('printer', 16)}</a>
+          <button type="button" id="add" class="btn btn-primary">${icon('plus')} Add</button></span></div>
       </div>
       <div id="items"></div>
       <div class="m-more" id="more" hidden style="border-top:0"><button type="button" id="more-btn" class="btn btn-secondary btn-block">Muat Lebih Banyak</button></div>`);
@@ -137,6 +138,8 @@
       ft.setAttribute('aria-label', filterActive() ? 'Filter (aktif)' : 'Filter');
     }
     function paint() {
+      const pq = qs(filterParams());
+      $('#print').href = `${S.ADMIN_PATH}/cetak/siswa${pq ? '?' + pq : ''}`;
       $('#count').textContent = `${list.total} dari ${list.totalAll} siswa`;
       $('#items').innerHTML = list.items.length ? list.items.map((s) => `
         <a class="m-item" href="#/siswa/${s.id}">
@@ -216,6 +219,7 @@
           <button type="button" class="btn btn-secondary" id="edit">${icon('edit')} Edit</button>
           <button type="button" class="btn btn-secondary btn-danger" id="del">${icon('trash')} Hapus</button>
         </div>
+        <a class="btn btn-secondary btn-block btn-center" href="${S.ADMIN_PATH}/cetak/siswa/${id}" target="_blank" rel="noopener">${icon('printer')} Cetak Biodata (PDF)</a>
       </div>
       <div class="d-fields">${rowsHtml(detailRows(s))}</div>`;
     c.querySelector('#edit').onclick = () => nav(`#/siswa/${id}/edit`);

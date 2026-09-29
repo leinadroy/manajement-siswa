@@ -1,0 +1,72 @@
+/* Halaman cetak (daftar siswa & biodata) — A4, disimpan ke PDF lewat dialog Print browser. */
+@page {
+  size: A4 portrait;
+  margin: 14mm 14mm 16mm;
+  @bottom-left { content: "Sistem Manajemen Data Siswa"; font: 8pt "Archivo", system-ui, sans-serif; color: #5a6272; }
+  @bottom-right { content: "Halaman " counter(page) " dari " counter(pages); font: 8pt "Archivo", system-ui, sans-serif; color: #5a6272; }
+}
+
+.print-body { background: var(--color-neutral-200); }
+.print-toolbar {
+  position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 24px; background: var(--color-bg); border-bottom: 2px solid var(--color-divider);
+}
+.print-toolbar-title { font-family: var(--font-heading); font-weight: 800; font-size: 16px; }
+.print-hint { margin-left: auto; font-size: 12px; color: var(--muted); }
+.print-hint b { color: var(--color-text); }
+
+/* Kertas A4 di layar */
+.paper {
+  width: 210mm; min-height: 297mm; margin: 24px auto; padding: 14mm; background: #fff;
+  box-shadow: var(--shadow-md); color: var(--color-text); font-size: 10pt; line-height: 1.45;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+
+/* Kop dokumen */
+.doc-head { display: flex; align-items: flex-end; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--color-text); margin-bottom: 14px; }
+.doc-kicker { display: flex; align-items: center; gap: 8px; font-size: 8pt; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-700); }
+.doc-kicker .mark { width: 10px; height: 10px; background: var(--color-accent); }
+.doc-title { font-family: var(--font-heading); font-weight: 800; font-size: 20pt; line-height: 1.1; margin: 4px 0 0; letter-spacing: -0.015em; }
+.doc-meta { margin-left: auto; text-align: right; font-size: 8.5pt; color: var(--color-neutral-700); line-height: 1.5; }
+.doc-meta b { color: var(--color-text); font-weight: 600; }
+.doc-filter { font-size: 9pt; padding: 6px 10px; background: var(--color-accent-100); border-left: 3px solid var(--color-accent); margin-bottom: 12px; }
+.doc-note { font-size: 8.5pt; color: var(--color-accent-800); margin-top: 10px; }
+
+/* Tabel daftar */
+.p-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.p-table th { text-align: left; font-size: 7.5pt; letter-spacing: .08em; text-transform: uppercase; color: var(--color-neutral-700); font-weight: 600; padding: 6px 6px; border-bottom: 2px solid var(--color-text); }
+.p-table td { padding: 4px 6px; border-bottom: 1px solid var(--color-neutral-300); vertical-align: middle; }
+.p-table tr { break-inside: avoid; page-break-inside: avoid; }
+.p-table thead { display: table-header-group; }
+.p-table .no { width: 28px; color: var(--color-neutral-700); text-align: right; }
+.p-table .ph { width: 34px; }
+.p-table .ph .photo { width: 26px; height: 26px; border: 0; }
+.p-table .nm { font-weight: 600; }
+.p-table .jk { width: 34px; text-align: center; }
+
+/* Biodata */
+.bio-top { display: grid; grid-template-columns: 30mm 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+.bio-top .photo { width: 30mm; height: 40mm; }
+.bio-name { font-family: var(--font-heading); font-weight: 800; font-size: 18pt; line-height: 1.15; margin-bottom: 6px; }
+.bio-ids { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; font-size: 9.5pt; margin-top: 10px; }
+.bio-ids span { color: var(--color-neutral-700); }
+.bio-sec { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12px; }
+.bio-sec h2 { font-family: var(--font-heading); font-size: 8pt; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-700); margin: 0; padding: 6px 0; border-bottom: 2px solid var(--color-divider); }
+.bio-row { display: grid; grid-template-columns: 52mm 1fr; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--color-neutral-300); font-size: 9.5pt; }
+.bio-row .k { color: var(--color-neutral-700); }
+.bio-row .v { font-weight: 600; white-space: pre-line; overflow-wrap: anywhere; }
+.bio-foot { margin-top: 18px; font-size: 8pt; color: var(--color-neutral-700); }
+
+@media (max-width: 860px) {
+  .paper { width: auto; min-height: 0; margin: 12px; padding: 16px; }
+  .print-hint { margin-left: 0; width: 100%; order: 5; }
+  .print-toolbar { padding: 10px 12px; }
+  .bio-row { grid-template-columns: 40% 1fr; }
+}
+
+@media print {
+  .print-body { background: #fff; }
+  .print-toolbar { display: none !important; }
+  .paper { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+}
