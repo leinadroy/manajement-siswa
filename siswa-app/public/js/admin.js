@@ -101,10 +101,19 @@
     const main = shell('dash', `<div class="welcome">
       <h1>Selamat datang, ${esc(admin.nama)}</h1>
       <p>Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom, dan berlaku selama sesi login masih aktif.</p>
-      <div class="stat"><b id="total">–</b><span>data siswa terdaftar</span></div><br>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div class="stat"><b id="total">–</b><span>data siswa terdaftar</span></div>
+        <div class="stat"><b id="totalPria">–</b><span>total pria</span></div>
+        <div class="stat"><b id="totalWanita">–</b><span>total wanita</span></div>
+      </div><br>
       <a href="${ADMIN_PATH}/siswa" data-nav="/siswa" class="btn btn-primary btn-lg">Buka Manajemen Siswa</a>
     </div>`);
-    try { main.querySelector('#total').textContent = (await api('/api/admin/stats')).totalSiswa; } catch (_) {}
+    try {
+      const s = await api('/api/admin/stats');
+      main.querySelector('#total').textContent = s.totalSiswa;
+      main.querySelector('#totalPria').textContent = s.totalPria;
+      main.querySelector('#totalWanita').textContent = s.totalWanita;
+    } catch (_) {}
   }
 
   // ---------- Grid (4.5) ----------

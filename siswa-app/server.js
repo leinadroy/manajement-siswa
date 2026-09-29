@@ -22,8 +22,10 @@ app.use((_req, res, next) => {
 
 app.use(express.json({ limit: '6mb' }));
 
-// Aset statis & foto
-app.use('/assets', express.static(path.join(__dirname, 'public'), { index: false, maxAge: '1h' }));
+// Aset statis & foto — cache 1 jam di production, tapi dimatikan saat development
+// (NODE_ENV != 'production') supaya perubahan JS/CSS langsung kelihatan tanpa hard refresh.
+const isDev = process.env.NODE_ENV !== 'production';
+app.use('/assets', express.static(path.join(__dirname, 'public'), { index: false, maxAge: isDev ? 0 : '1h' }));
 app.use('/uploads', express.static(UPLOAD_DIR, { index: false, maxAge: '1d' }));
 
 // ---------- API ----------
