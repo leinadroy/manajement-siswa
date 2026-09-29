@@ -38,6 +38,7 @@
     if (p === '/siswa') return renderGrid();
     if (p === '/siswa/baru') return renderForm(null);
     if ((m = /^\/siswa\/(\d+)\/edit$/.exec(p))) return renderForm(Number(m[1]));
+    if (p === '/kelas') return renderKelas();
     go('/', true);
   }
 
@@ -79,6 +80,7 @@
         <div class="bo-side-name">${esc(admin.nama)}</div>
         <a href="${ADMIN_PATH}" data-nav="/" class="bo-menu" ${active === 'dash' ? 'aria-current="page"' : ''}>Dashboard</a>
         <a href="${ADMIN_PATH}/siswa" data-nav="/siswa" class="bo-menu" ${active === 'siswa' ? 'aria-current="page"' : ''}>Manajemen Siswa</a>
+        <a href="${ADMIN_PATH}/kelas" data-nav="/kelas" class="bo-menu" ${active === 'kelas' ? 'aria-current="page"' : ''}>Manajemen Kelas</a>
         <button type="button" class="btn btn-secondary bo-logout" id="logout">${icon('logout')} Logout</button>
       </aside>
       <main class="bo-main" id="main">${content}</main></div>`;
@@ -93,6 +95,13 @@
     try { await api('/api/auth/logout', { method: 'POST', skipAuthRedirect: true }); } catch (_) {}
     admin = null;
     go('/login', true);
+  }
+
+  // ---------- Manajemen Kelas (placeholder, belum ada fitur) ----------
+  function renderKelas() {
+    document.title = 'Manajemen Kelas — Back Office';
+    shell('kelas', `<div class="bo-titlebar"><h1>Manajemen Kelas</h1></div>
+      <div class="empty">Halaman ini belum tersedia. Fitur Manajemen Kelas akan menyusul.</div>`);
   }
 
   // ---------- Dashboard (4.3) ----------

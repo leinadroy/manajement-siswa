@@ -58,7 +58,7 @@ const guardPage = (req, res, next) => {
     next();
   });
 };
-app.get([ADMIN_PATH, `${ADMIN_PATH}/siswa`, `${ADMIN_PATH}/siswa/baru`, `${ADMIN_PATH}/siswa/:id/edit`],
+app.get([ADMIN_PATH, `${ADMIN_PATH}/siswa`, `${ADMIN_PATH}/siswa/baru`, `${ADMIN_PATH}/siswa/:id/edit`, `${ADMIN_PATH}/kelas`],
   guardPage, (_req, res) => sendView(res, 'admin.html'));
 
 // Aplikasi mobile admin (PRD 4.7) — satu halaman; view login/app ditentukan oleh /api/auth/me.
