@@ -88,13 +88,24 @@
     const c = shell({ title: 'Dashboard' }, `<div class="m-dash">
         <div><div class="muted" style="font-size:14px">Selamat datang,</div><div class="m-title">${esc(admin.nama)}</div></div>
         <div class="hr"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div class="stat"><b id="total">–</b><span>total siswa</span></div>
+          <div class="stat"><b id="totalPria">–</b><span>total pria</span></div>
+          <div class="stat"><b id="totalWanita">–</b><span>total wanita</span></div>
+        </div>
         <button type="button" class="card elev-sm m-menu-card" id="menu-siswa">
           <div class="m-menu-row">${icon('users', 24, 'style="color:var(--color-accent-700);flex:none"')}
             <div style="min-width:0;flex:1"><div class="card-title" style="font-size:15px">Manajemen Siswa</div><div class="card-meta" id="cnt">– data siswa</div></div>
             ${icon('chevron', 16, 'style="color:var(--color-neutral-700)"')}</div>
         </button></div>`);
     c.querySelector('#menu-siswa').onclick = () => nav('#/siswa');
-    try { c.querySelector('#cnt').textContent = `${(await api('/api/admin/stats')).totalSiswa} data siswa`; } catch (_) {}
+    try {
+      const s = await api('/api/admin/stats');
+      c.querySelector('#total').textContent = s.totalSiswa;
+      c.querySelector('#totalPria').textContent = s.totalPria;
+      c.querySelector('#totalWanita').textContent = s.totalWanita;
+      c.querySelector('#cnt').textContent = `${s.totalSiswa} data siswa`;
+    } catch (_) {}
   }
 
   // ---------- 4.7.3 List ----------
