@@ -32,12 +32,12 @@
         <input id="d-sampai" type="date" class="input">
       </div>
       <div class="field">
-        <span class="label" id="d-jk-l">Jenis Kelamin</span>
-        <div class="seg" role="radiogroup" aria-labelledby="d-jk-l">
-          <label class="seg-opt"><input type="radio" name="d-jk" value="ALL" checked>Semua</label>
-          <label class="seg-opt"><input type="radio" name="d-jk" value="L">Laki-laki</label>
-          <label class="seg-opt"><input type="radio" name="d-jk" value="P">Perempuan</label>
-        </div>
+        <label for="d-jk">Jenis Kelamin</label>
+        <select id="d-jk" class="input">
+          <option value="ALL">Semua</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
       </div>
       <button type="button" class="btn btn-secondary" id="d-reset">Reset</button>
     </form>
@@ -60,11 +60,12 @@
         <input id="m-q" type="search" class="input" placeholder="Cari nama atau tempat lahir..." autocomplete="off">
         <button type="button" id="m-ftoggle" class="btn btn-icon btn-secondary" aria-label="Filter" aria-expanded="false" aria-controls="m-filters"></button>
       </div>
-      <div class="seg" role="radiogroup" aria-label="Jenis kelamin">
-        <label class="seg-opt"><input type="radio" name="m-jk" value="ALL" checked>Semua</label>
-        <label class="seg-opt"><input type="radio" name="m-jk" value="L">Laki-laki</label>
-        <label class="seg-opt"><input type="radio" name="m-jk" value="P">Perempuan</label>
-      </div>
+      <label for="m-jk" class="sr-only">Jenis kelamin</label>
+      <select id="m-jk" class="input">
+        <option value="ALL">Semua Jenis Kelamin</option>
+        <option value="L">Laki-laki</option>
+        <option value="P">Perempuan</option>
+      </select>
       <div class="m-filters" id="m-filters" hidden>
         <div class="field">
           <label for="m-kota">Tempat Lahir</label>

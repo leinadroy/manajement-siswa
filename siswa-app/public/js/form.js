@@ -26,11 +26,8 @@
       ${req('nama', 'Nama', `<input id="${p}-nama" type="text" class="input" data-k="nama" value="${esc(d.nama)}" autocomplete="off" maxlength="200">`)}
       ${req('tempatLahir', 'Tempat Lahir', `<input id="${p}-tempatLahir" type="text" class="input" data-k="tempatLahir" value="${esc(d.tempatLahir)}" list="${p}-cities" autocomplete="off" maxlength="200"><datalist id="${p}-cities">${cities.map((c) => `<option value="${esc(c)}">`).join('')}</datalist>`)}
       ${req('tanggalLahir', 'Tanggal Lahir', `<input id="${p}-tanggalLahir" type="date" class="input" data-k="tanggalLahir" value="${esc(d.tanggalLahir)}">`)}
-      <div class="field" data-field="jenisKelamin"><span class="label" id="${p}-jk-l">Jenis Kelamin *</span>
-        <div class="seg" role="radiogroup" aria-labelledby="${p}-jk-l">
-          <label class="seg-opt"><input type="radio" name="${p}-jk" value="L" ${d.jenisKelamin === 'L' ? 'checked' : ''}>Laki-laki</label>
-          <label class="seg-opt"><input type="radio" name="${p}-jk" value="P" ${d.jenisKelamin === 'P' ? 'checked' : ''}>Perempuan</label>
-        </div><div class="field-error" hidden></div></div>`;
+      ${req('jenisKelamin', 'Jenis Kelamin', `<select id="${p}-jenisKelamin" class="input" data-k="jenisKelamin"><option value="">— Pilih —</option>${[['L', 'Laki-laki'], ['P', 'Perempuan']].map(([v, l]) =>
+        `<option value="${v}" ${d.jenisKelamin === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`)}`;
 
     const extraFields = EXTRA_FIELDS.map((f) =>
       `<div class="field ${isDesk && f.wide ? 'span-all' : ''}" data-field="${f.key}"><label for="${p}-${f.key}">${f.label}</label>${control(f, d[f.key], `${p}-${f.key}`)}<div class="field-error" hidden></div></div>`).join('');
@@ -87,7 +84,7 @@
       if (box) { box.hidden = !msg; box.textContent = msg || ''; }
       if (key === 'foto') photoEl.classList.toggle('invalid', !!msg);
       else {
-        const ctl = q(`[data-field="${key}"] .input, [data-field="${key}"] .seg`);
+        const ctl = q(`[data-field="${key}"] .input`);
         if (ctl) ctl.classList.toggle('invalid', !!msg);
       }
     }
@@ -95,8 +92,6 @@
     function payload() {
       const out = {};
       container.querySelectorAll('[data-k]').forEach((el) => { out[el.dataset.k] = el.value.trim(); });
-      const jk = q(`input[name="${p}-jk"]:checked`);
-      out.jenisKelamin = jk ? jk.value : '';
       if (state.fotoData) out.fotoData = state.fotoData;
       return out;
     }

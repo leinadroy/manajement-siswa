@@ -48,7 +48,7 @@
     $('d-dari').value = state.dari; $('m-dari').value = state.dari;
     $('d-sampai').value = state.sampai; $('m-sampai').value = state.sampai;
     $('m-q').value = state.q;
-    document.querySelectorAll('input[name="d-jk"], input[name="m-jk"]').forEach((r) => { r.checked = r.value === state.jk; });
+    $('d-jk').value = state.jk; $('m-jk').value = state.jk;
     const active = !!(state.kota || state.dari || state.sampai);
     const ft = $('m-ftoggle');
     ft.className = 'btn btn-icon ' + (active ? 'btn-primary' : 'btn-secondary');
@@ -159,7 +159,7 @@
   $('d-kota').onchange = (e) => setFilter({ kota: e.target.value });
   $('d-dari').onchange = (e) => setFilter({ dari: e.target.value });
   $('d-sampai').onchange = (e) => setFilter({ sampai: e.target.value });
-  document.querySelectorAll('input[name="d-jk"]').forEach((r) => { r.onchange = () => setFilter({ jk: r.value }); });
+  $('d-jk').onchange = (e) => setFilter({ jk: e.target.value });
   $('d-reset').onclick = () => setFilter({ kota: '', dari: '', sampai: '', jk: 'ALL' });
   $('d-pager').onclick = (e) => {
     const b = e.target.closest('button[data-page]');
@@ -171,7 +171,7 @@
   // Mobile events
   const onSearch = debounce(() => setFilter({ q: $('m-q').value }), 250);
   $('m-q').addEventListener('input', onSearch);
-  document.querySelectorAll('input[name="m-jk"]').forEach((r) => { r.onchange = () => setFilter({ jk: r.value }); });
+  $('m-jk').onchange = (e) => setFilter({ jk: e.target.value });
   $('m-ftoggle').onclick = () => {
     const panel = $('m-filters');
     panel.hidden = !panel.hidden;
