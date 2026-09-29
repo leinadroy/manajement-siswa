@@ -100,7 +100,7 @@
     document.title = 'Dashboard — Back Office';
     const main = shell('dash', `<div class="welcome">
       <h1>Selamat datang, ${esc(admin.nama)}</h1>
-      <p>Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom.</p>
+      <p>Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom, dan berlaku selama sesi login masih aktif.</p>
       <div class="stat"><b id="total">–</b><span>data siswa terdaftar</span></div><br>
       <a href="${ADMIN_PATH}/siswa" data-nav="/siswa" class="btn btn-primary btn-lg">Buka Manajemen Siswa</a>
     </div>`);
