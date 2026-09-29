@@ -106,6 +106,7 @@ function cities() {
 }
 
 function count() { return db.prepare('SELECT COUNT(*) AS n FROM siswa').get().n; }
+function countByGender(jk) { return db.prepare('SELECT COUNT(*) AS n FROM siswa WHERE jenis_kelamin = ?').get(jk).n; }
 
 // ---------- Validasi & simpan ----------
 function normalize(body) {
@@ -191,4 +192,4 @@ function remove(id) {
   return true;
 }
 
-module.exports = { list, listForPrint, get, cities, count, create, update, remove };
+module.exports = { list, listForPrint, get, cities, count, countByGender, create, update, remove };

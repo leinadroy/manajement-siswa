@@ -6,7 +6,11 @@ const { requireApiAuth } = require('../auth');
 const router = express.Router();
 router.use(requireApiAuth);
 
-router.get('/stats', (_req, res) => res.json({ totalSiswa: siswa.count() }));
+router.get('/stats', (_req, res) => res.json({
+  totalSiswa: siswa.count(),
+  totalPria: siswa.countByGender('L'),
+  totalWanita: siswa.countByGender('P'),
+}));
 router.get('/kota', (_req, res) => res.json(siswa.cities()));
 
 // Data untuk halaman cetak PDF: daftar (sesuai pencarian/filter) & biodata.

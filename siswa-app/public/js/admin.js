@@ -38,6 +38,7 @@
     if (p === '/siswa') return renderGrid();
     if (p === '/siswa/baru') return renderForm(null);
     if ((m = /^\/siswa\/(\d+)\/edit$/.exec(p))) return renderForm(Number(m[1]));
+    if (p === '/kelas') return renderKelas();
     go('/', true);
   }
 
@@ -79,6 +80,7 @@
         <div class="bo-side-name">${esc(admin.nama)}</div>
         <a href="${ADMIN_PATH}" data-nav="/" class="bo-menu" ${active === 'dash' ? 'aria-current="page"' : ''}>Dashboard</a>
         <a href="${ADMIN_PATH}/siswa" data-nav="/siswa" class="bo-menu" ${active === 'siswa' ? 'aria-current="page"' : ''}>Manajemen Siswa</a>
+        <a href="${ADMIN_PATH}/kelas" data-nav="/kelas" class="bo-menu" ${active === 'kelas' ? 'aria-current="page"' : ''}>Manajemen Kelas</a>
         <button type="button" class="btn btn-secondary bo-logout" id="logout">${icon('logout')} Logout</button>
       </aside>
       <main class="bo-main" id="main">${content}</main></div>`;
@@ -95,16 +97,32 @@
     go('/login', true);
   }
 
+  // ---------- Manajemen Kelas (placeholder, belum ada fitur) ----------
+  function renderKelas() {
+    document.title = 'Manajemen Kelas — Back Office';
+    shell('kelas', `<div class="bo-titlebar"><h1>Manajemen Kelas</h1></div>
+      <div class="empty">Halaman ini belum tersedia. Fitur Manajemen Kelas akan menyusul.</div>`);
+  }
+
   // ---------- Dashboard (4.3) ----------
   async function renderDashboard() {
     document.title = 'Dashboard — Back Office';
     const main = shell('dash', `<div class="welcome">
       <h1>Selamat datang, ${esc(admin.nama)}</h1>
-      <p>Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom.</p>
-      <div class="stat"><b id="total">–</b><span>data siswa terdaftar</span></div><br>
+      <p>Gunakan menu di sisi kiri untuk mengelola data siswa. Sesi Anda tervalidasi melalui tabel sesi kustom, dan berlaku selama sesi login masih aktif.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div class="stat"><b id="total">–</b><span>data siswa terdaftar</span></div>
+        <div class="stat"><b id="totalPria">–</b><span>total pria</span></div>
+        <div class="stat"><b id="totalWanita">–</b><span>total wanita</span></div>
+      </div><br>
       <a href="${ADMIN_PATH}/siswa" data-nav="/siswa" class="btn btn-primary btn-lg">Buka Manajemen Siswa</a>
     </div>`);
-    try { main.querySelector('#total').textContent = (await api('/api/admin/stats')).totalSiswa; } catch (_) {}
+    try {
+      const s = await api('/api/admin/stats');
+      main.querySelector('#total').textContent = s.totalSiswa;
+      main.querySelector('#totalPria').textContent = s.totalPria;
+      main.querySelector('#totalWanita').textContent = s.totalWanita;
+    } catch (_) {}
   }
 
   // ---------- Grid (4.5) ----------
